@@ -25,6 +25,8 @@ import {
   Sparkles,
   PieChart,
   Trophy,
+  Globe,
+  Package2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -108,6 +110,8 @@ export function AppSidebar() {
       label: t("nav.system"),
       items: [
         { url: "/reports", icon: BarChart3, title: t("nav.reports"), module: "reports" },
+        { url: "/site-builder", icon: Globe, title: "بناء الموقع" },
+        { url: "/online-orders", icon: Package2, title: "طلبات الموقع" },
         { url: "/dashboard/executive", icon: BarChart3, title: "داشبورد تنفيذي", module: "reports" },
         { url: "/dashboard/forecast", icon: Sparkles, title: "توقع AI", module: "reports" },
         { url: "/dashboard/profitability", icon: PieChart, title: "تحليل الربحية", module: "reports" },
