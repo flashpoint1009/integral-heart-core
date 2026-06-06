@@ -42,7 +42,7 @@ import {
 export function AppSidebar() {
   const { t } = useTranslation();
   const { state } = useSidebar();
-  const { hasAnyRole, isDeveloper, moduleEnabled } = useAuth();
+  const { hasAnyRole, isDeveloper, moduleEnabled, screenAllowed } = useAuth();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
@@ -51,7 +51,7 @@ export function AppSidebar() {
     hasAnyRole(["admin", "manager", "supervisor"]) && moduleEnabled("supervisor");
   const showDeveloper = isDeveloper || hasAnyRole(["admin"]);
 
-  type Item = { url: string; icon: typeof LayoutDashboard; title: string; module?: string };
+  type Item = { url: string; icon: typeof LayoutDashboard; title: string; module?: string; screen?: string };
   type Group = { label: string; items: Item[] };
 
   const groupsRaw: Group[] = [
@@ -113,6 +113,7 @@ export function AppSidebar() {
         { url: "/dashboard/profitability", icon: PieChart, title: "تحليل الربحية", module: "reports" },
         { url: "/dashboard/reps", icon: Trophy, title: "أداء المندوبين", module: "rep" },
         { url: "/users", icon: UserCog, title: t("nav.users") },
+        ...(hasAnyRole(["admin", "manager"]) ? [{ url: "/permissions", icon: UserCog, title: "صلاحيات الموظفين" } as Item] : []),
         { url: "/settings", icon: Settings, title: t("nav.settings") },
       ],
     },
@@ -122,7 +123,9 @@ export function AppSidebar() {
   const groups = groupsRaw
     .map((g) => ({
       ...g,
-      items: g.items.filter((it) => !it.module || moduleEnabled(it.module)),
+      items: g.items.filter((it) =>
+        (!it.module || moduleEnabled(it.module)) && screenAllowed(it.url),
+      ),
     }))
     .filter((g) => g.items.length > 0);
 
