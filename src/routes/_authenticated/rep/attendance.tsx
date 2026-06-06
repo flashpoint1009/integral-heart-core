@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { repCheckIn, repCheckOut } from "@/lib/api/rep.functions";
@@ -25,15 +25,6 @@ function getPos(): Promise<{ lat: number | null; lng: number | null }> {
   });
 }
 
-function distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
-  const R = 6371000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
-
 function Attendance() {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -42,17 +33,6 @@ function Attendance() {
   const [loadingGps, setLoadingGps] = useState(false);
   const [myPos, setMyPos] = useState<{ lat: number; lng: number } | null>(null);
   const [posError, setPosError] = useState<string | null>(null);
-  const autoTriedRef = useRef(false);
-
-  const { data: office } = useQuery({
-    queryKey: ["company_office"],
-    queryFn: async () => {
-      const { data } = await supabase.from("company_settings").select("extra").limit(1).maybeSingle();
-      const ex: any = data?.extra ?? {};
-      if (ex.office_lat == null || ex.office_lng == null) return null;
-      return { lat: Number(ex.office_lat), lng: Number(ex.office_lng), radius: Number(ex.office_radius_m ?? 150) };
-    },
-  });
 
   const { data: openCi } = useQuery({
     queryKey: ["rep_open_checkin"],
@@ -77,7 +57,7 @@ function Attendance() {
   const active = openCi && !openCi.check_out_at;
   const ended = openCi && openCi.check_out_at;
 
-  // Track position
+  // Track position (informational only — no geofence for field reps)
   useEffect(() => {
     if (!navigator.geolocation) { setPosError("الجهاز لا يدعم GPS"); return; }
     const id = navigator.geolocation.watchPosition(
@@ -88,45 +68,25 @@ function Attendance() {
     return () => navigator.geolocation.clearWatch(id);
   }, []);
 
-  const dist = myPos && office ? distanceMeters(myPos, office) : null;
-  const inRange = dist !== null && office ? dist <= office.radius : false;
-
-  // Auto check-in when entering range
-  useEffect(() => {
-    if (autoTriedRef.current) return;
-    if (!office || !myPos) return;
-    if (active || ended) return;
-    if (!inRange) return;
-    autoTriedRef.current = true;
-    checkIn.mutate();
-  }, [office, myPos, inRange, active, ended]);
-
   return (
     <div className="p-4 space-y-4">
       <h1 className="text-xl font-bold">{t("rep.attendance")}</h1>
 
-      {office && (
-        <Card>
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className={`h-10 w-10 rounded-full grid place-items-center ${inRange ? "bg-emerald-500/15 text-emerald-600" : "bg-amber-500/15 text-amber-600"}`}>
-              <Navigation className="h-5 w-5" />
+      <Card>
+        <CardContent className="p-4 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full grid place-items-center bg-emerald-500/15 text-emerald-600">
+            <Navigation className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">
+              {myPos ? "موقعك مُسجَّل" : posError ? "تعذّر تحديد موقعك" : "جارٍ تحديد موقعك…"}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold">
-                {!myPos ? "جارٍ تحديد موقعك…" : inRange ? "أنت داخل نطاق الشركة" : "أنت خارج نطاق الشركة"}
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {dist !== null ? `المسافة: ${Math.round(dist)} م • النطاق: ${office.radius} م` : posError ?? "—"}
-              </div>
+            <div className="text-xs text-muted-foreground">
+              {myPos ? `${myPos.lat.toFixed(5)}, ${myPos.lng.toFixed(5)}` : posError ?? "—"} • يمكنك تسجيل الحضور من أي مكان
             </div>
-          </CardContent>
-        </Card>
-      )}
-      {!office && (
-        <Card><CardContent className="p-3 text-xs text-amber-700 dark:text-amber-400">
-          لم يتم تحديد موقع الشركة بعد. اطلب من المسؤول ضبطه من الإعدادات لتفعيل الحضور التلقائي.
-        </CardContent></Card>
-      )}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="p-6 space-y-4 text-center">

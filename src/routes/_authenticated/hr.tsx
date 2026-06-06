@@ -26,11 +26,19 @@ export const Route = createFileRoute("/_authenticated/hr")({
 });
 
 const fmt = (n: number) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const monthRange = (yyyymm: string) => {
+const monthRange = (yyyymm: string, cycleStartDay = 1) => {
   const [y, m] = yyyymm.split("-").map(Number);
-  const start = new Date(Date.UTC(y, m - 1, 1));
-  const end = new Date(Date.UTC(y, m, 0));
-  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10), days: end.getUTCDate() };
+  const d = Math.min(28, Math.max(1, cycleStartDay));
+  // Period "yyyy-mm" represents the cycle that ENDS within that month.
+  // start = day d of (month - 1) when d > 1, else day 1 of month.
+  const start = d === 1
+    ? new Date(Date.UTC(y, m - 1, 1))
+    : new Date(Date.UTC(y, m - 2, d));
+  const end = d === 1
+    ? new Date(Date.UTC(y, m, 0))
+    : new Date(Date.UTC(y, m - 1, d - 1));
+  const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10), days };
 };
 
 function StatCard({ label, value, icon: Icon, tint, color }: { label: string; value: string | number; icon: any; tint: string; color: string }) {
@@ -725,6 +733,8 @@ function PayrollTab() {
 
   const { data: employees = [] } = useQuery({ queryKey: ["employees"], queryFn: async () => (await supabase.from("employees").select("*").eq("is_active", true).order("full_name")).data ?? [] });
   const { data: runs = [] } = useQuery({ queryKey: ["payroll_runs"], queryFn: async () => (await supabase.from("payroll_runs").select("*").order("period_month", { ascending: false })).data ?? [] });
+  const { data: cfg } = useQuery({ queryKey: ["company_settings_cycle"], queryFn: async () => (await supabase.from("company_settings").select("extra").limit(1).maybeSingle()).data });
+  const cycleStartDay = Math.min(28, Math.max(1, Number((cfg as any)?.extra?.payroll_cycle_start_day) || 1));
   const periodDate = period + "-01";
   const currentRun = (runs as any[]).find((r) => r.period_month === periodDate) ?? null;
   const { data: items = [] } = useQuery({
@@ -748,7 +758,9 @@ function PayrollTab() {
 
   const generate = useMutation({
     mutationFn: async () => {
-      const { start, end, days: daysInMonth } = monthRange(period);
+      const { start, end, days: daysInMonth } = monthRange(period, cycleStartDay);
+      const startDateMs = new Date(start + "T00:00:00Z").getTime();
+      const endDateMs = new Date(end + "T00:00:00Z").getTime();
 
       // Fetch period-scoped data once for all employees
       const [attRes, penRes, advRes, bonRes] = await Promise.all([
@@ -793,10 +805,22 @@ function PayrollTab() {
         const allow = Number(e.allowances || 0);
         const transport = Number(e.transport_allowance || 0);
         const dailyRate = base / daysInMonth;
+        // Pro-rate for new hires whose hire_date falls inside this cycle
+        let workedDays = daysInMonth;
+        if (e.hire_date) {
+          const hireMs = new Date(e.hire_date + "T00:00:00Z").getTime();
+          if (hireMs > endDateMs) continue; // hired after this cycle ends
+          if (hireMs > startDateMs) {
+            workedDays = Math.round((endDateMs - hireMs) / 86400000) + 1;
+          }
+        }
+        const proratedBase = +(dailyRate * workedDays).toFixed(2);
+        const proratedAllow = +((allow / daysInMonth) * workedDays).toFixed(2);
+        const proratedTransport = +((transport / daysInMonth) * workedDays).toFixed(2);
         const absDays = absMap.get(e.id) ?? 0;
         const absDed = +(absDays * dailyRate).toFixed(2);
         const penTotal = +(penMap.get(e.id) ?? 0).toFixed(2);
-        const insurance = +(base * Number(e.insurance_employee_pct || 0) / 100).toFixed(2);
+        const insurance = +(proratedBase * Number(e.insurance_employee_pct || 0) / 100).toFixed(2);
         let advDed = 0;
         for (const adv of advByEmp.get(e.id) ?? []) {
           const take = Math.min(Number(adv.monthly_deduction), Number(adv.remaining));
@@ -809,10 +833,10 @@ function PayrollTab() {
         const bonuses = +bz.bonuses.toFixed(2);
         const incentives = +bz.incentives.toFixed(2);
         const deductions = +(insurance + penTotal + absDed + advDed).toFixed(2);
-        const net = +(base + allow + transport + bonuses + incentives - deductions).toFixed(2);
+        const net = +(proratedBase + proratedAllow + proratedTransport + bonuses + incentives - deductions).toFixed(2);
         lines.push({
           run_id: run.id, employee_id: e.id,
-          base_salary: base, allowances: allow, transport_allowance: transport,
+          base_salary: proratedBase, allowances: proratedAllow, transport_allowance: proratedTransport,
           bonuses, incentives,
           insurance, penalties_total: penTotal,
           absence_days: absDays, absence_deduction: absDed,
