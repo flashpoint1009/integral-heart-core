@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Save, MapPin, Crosshair } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({ meta: [{ title: "Settings — ERP" }] }),
@@ -30,12 +30,14 @@ type Settings = {
   phone: string | null;
   email: string | null;
   tax_number: string | null;
+  extra?: any;
 };
 
 const blank: Settings = {
   company_name: "My Company", logo_url: "", currency: "EGP", currency_symbol: "ج.م",
   default_tax_rate: 14, default_locale: "ar",
   address: "", phone: "", email: "", tax_number: "",
+  extra: {},
 };
 
 function Page() {
@@ -58,6 +60,12 @@ function Page() {
 
   const save = useMutation({
     mutationFn: async () => {
+      const extra = {
+        ...(form.extra ?? {}),
+        office_lat: form.extra?.office_lat ?? null,
+        office_lng: form.extra?.office_lng ?? null,
+        office_radius_m: Number(form.extra?.office_radius_m ?? 150) || 150,
+      };
       const payload = {
         company_name: form.company_name,
         logo_url: form.logo_url || null,
@@ -69,6 +77,7 @@ function Page() {
         phone: form.phone || null,
         email: form.email || null,
         tax_number: form.tax_number || null,
+        extra,
       };
       if (data?.id) {
         const { error } = await supabase.from("company_settings").update(payload).eq("id", data.id);
@@ -83,6 +92,20 @@ function Page() {
   });
 
   const set = <K extends keyof Settings>(k: K, v: Settings[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const setExtra = (k: string, v: any) => setForm((f) => ({ ...f, extra: { ...(f.extra ?? {}), [k]: v } }));
+
+  const captureLocation = () => {
+    if (!navigator.geolocation) { toast.error("الجهاز لا يدعم GPS"); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setExtra("office_lat", Number(pos.coords.latitude.toFixed(6)));
+        setExtra("office_lng", Number(pos.coords.longitude.toFixed(6)));
+        toast.success("تم تحديد موقع الشركة");
+      },
+      (err) => toast.error("فشل GPS: " + err.message),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  };
 
   return (
     <div className="p-6 space-y-4">
@@ -113,6 +136,34 @@ function Page() {
           <div className="grid gap-1.5"><Label>{t("settings.email")}</Label><Input disabled={!isAdmin} type="email" value={form.email ?? ""} onChange={(e) => set("email", e.target.value)} /></div>
           <div className="grid gap-1.5"><Label>{t("settings.tax_number")}</Label><Input disabled={!isAdmin} value={form.tax_number ?? ""} onChange={(e) => set("tax_number", e.target.value)} /></div>
           <div className="grid gap-1.5 md:col-span-2"><Label>{t("settings.address")}</Label><Textarea rows={2} disabled={!isAdmin} value={form.address ?? ""} onChange={(e) => set("address", e.target.value)} /></div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold flex items-center gap-2"><MapPin className="h-4 w-4 text-primary" />موقع الشركة (الحضور التلقائي)</div>
+              <p className="text-xs text-muted-foreground mt-1">يسجّل الموظف الحضور تلقائياً عند الوصول لهذا الموقع من الموبايل.</p>
+            </div>
+            <Button type="button" variant="outline" disabled={!isAdmin} onClick={captureLocation}>
+              <Crosshair className="h-4 w-4 me-2" />التقاط الموقع الحالي
+            </Button>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid gap-1.5">
+              <Label>خط العرض (Latitude)</Label>
+              <Input disabled={!isAdmin} type="number" step="0.000001" value={form.extra?.office_lat ?? ""} onChange={(e) => setExtra("office_lat", e.target.value === "" ? null : Number(e.target.value))} placeholder="30.0444" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>خط الطول (Longitude)</Label>
+              <Input disabled={!isAdmin} type="number" step="0.000001" value={form.extra?.office_lng ?? ""} onChange={(e) => setExtra("office_lng", e.target.value === "" ? null : Number(e.target.value))} placeholder="31.2357" />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>نطاق الحضور (متر)</Label>
+              <Input disabled={!isAdmin} type="number" min={20} max={5000} step="10" value={form.extra?.office_radius_m ?? 150} onChange={(e) => setExtra("office_radius_m", Number(e.target.value))} />
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
