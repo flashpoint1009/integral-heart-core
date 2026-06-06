@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, useNavigate, Link, useRouterState } from "@tan
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/lib/auth-context";
-import { MapPin, CalendarRange, BarChart3, LayoutDashboard } from "lucide-react";
+import { MapPin, CalendarRange, BarChart3, LayoutDashboard, FileText } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/supervisor")({
   component: SupervisorLayout,
@@ -24,6 +24,7 @@ function SupervisorLayout() {
     { to: "/supervisor", icon: LayoutDashboard, label: t("supervisor.overview") },
     { to: "/supervisor/live", icon: MapPin, label: t("supervisor.liveMap") },
     { to: "/supervisor/routes", icon: CalendarRange, label: t("supervisor.routes") },
+    { to: "/supervisor/requests", icon: FileText, label: "الطلبات" },
     { to: "/supervisor/reports", icon: BarChart3, label: t("supervisor.reports") },
   ];
 

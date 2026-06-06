@@ -902,6 +902,60 @@ export type Database = {
           },
         ]
       }
+      late_permissions: {
+        Row: {
+          created_at: string
+          employee_id: string
+          id: string
+          late_minutes: number
+          reason: string | null
+          request_date: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          tenant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          employee_id: string
+          id?: string
+          late_minutes: number
+          reason?: string | null
+          request_date?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tenant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          employee_id?: string
+          id?: string
+          late_minutes?: number
+          reason?: string | null
+          request_date?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "late_permissions_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "late_permissions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leave_requests: {
         Row: {
           created_at: string
@@ -2167,6 +2221,7 @@ export type Database = {
       cash_or_bank_chart_id: { Args: { _account_id: string }; Returns: string }
       current_employee_id: { Args: never; Returns: string }
       current_tenant_id: { Args: never; Returns: string }
+      ensure_employee_for_user: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
