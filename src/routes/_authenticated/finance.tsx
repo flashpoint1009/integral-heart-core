@@ -631,3 +631,61 @@ function JournalTab() {
     </Card>
   );
 }
+
+/* -------- Trial Balance -------- */
+function TrialBalanceTab() {
+  const { t, i18n } = useTranslation();
+  const isAr = i18n.language === "ar";
+  const { data: rows = [] } = useQuery({
+    queryKey: ["trial_balance"],
+    queryFn: async () => (await supabase.from("v_trial_balance").select("*").order("code")).data ?? [],
+  });
+  const totals = (rows as any[]).reduce((a, r) => ({ d: a.d + Number(r.total_debit || 0), c: a.c + Number(r.total_credit || 0) }), { d: 0, c: 0 });
+  const balanced = Math.abs(totals.d - totals.c) < 0.01;
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-500/0 border-border/60"><CardContent className="pt-5"><div className="text-xs text-muted-foreground">{t("finance.totalDebit")}</div><div className="text-2xl font-bold tabular-nums mt-1 text-emerald-700">{fmt(totals.d)}</div></CardContent></Card>
+        <Card className="bg-gradient-to-br from-rose-500/10 to-rose-500/0 border-border/60"><CardContent className="pt-5"><div className="text-xs text-muted-foreground">{t("finance.totalCredit")}</div><div className="text-2xl font-bold tabular-nums mt-1 text-rose-700">{fmt(totals.c)}</div></CardContent></Card>
+        <Card className={`bg-gradient-to-br ${balanced ? "from-primary/10" : "from-amber-500/10"} to-transparent border-border/60`}><CardContent className="pt-5"><div className="text-xs text-muted-foreground">{t("finance.balanceCheck")}</div><div className={`text-2xl font-bold mt-1 ${balanced ? "text-primary" : "text-amber-700"}`}>{balanced ? t("finance.balanced") : fmt(totals.d - totals.c)}</div></CardContent></Card>
+      </div>
+      <Card className="border-border/60"><CardContent className="pt-6 overflow-x-auto">
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead className="font-mono w-20">{t("finance.code")}</TableHead>
+            <TableHead>{t("finance.account")}</TableHead>
+            <TableHead>{t("finance.accountType")}</TableHead>
+            <TableHead className="text-end">{t("finance.totalDebit")}</TableHead>
+            <TableHead className="text-end">{t("finance.totalCredit")}</TableHead>
+            <TableHead className="text-end">{t("finance.balance")}</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>
+            {(rows as any[]).length === 0 ? (
+              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
+            ) : (rows as any[]).map((r: any) => {
+              const bal = Number(r.balance);
+              return (
+                <TableRow key={r.account_id} className="hover:bg-muted/40">
+                  <TableCell className="font-mono text-muted-foreground">{r.code}</TableCell>
+                  <TableCell className="font-semibold text-primary">{isAr ? r.name_ar : (r.name_en || r.name_ar)}</TableCell>
+                  <TableCell><Badge variant="outline" className="rounded-full">{t(`finance.types.${r.type}`)}</Badge></TableCell>
+                  <TableCell className="text-end tabular-nums">{fmt(Number(r.total_debit))}</TableCell>
+                  <TableCell className="text-end tabular-nums">{fmt(Number(r.total_credit))}</TableCell>
+                  <TableCell className={`text-end tabular-nums font-semibold ${bal >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{fmt(bal)}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+          <tfoot>
+            <TableRow className="bg-muted/50 font-bold">
+              <TableCell colSpan={3}>{t("finance.total")}</TableCell>
+              <TableCell className="text-end tabular-nums">{fmt(totals.d)}</TableCell>
+              <TableCell className="text-end tabular-nums">{fmt(totals.c)}</TableCell>
+              <TableCell className="text-end tabular-nums">{fmt(totals.d - totals.c)}</TableCell>
+            </TableRow>
+          </tfoot>
+        </Table>
+      </CardContent></Card>
+    </div>
+  );
+}
