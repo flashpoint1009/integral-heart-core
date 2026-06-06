@@ -90,37 +90,41 @@ function Page() {
   const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const cards = [
-    { label: t("reports.invoicesCount"), value: summary.count, icon: Receipt, accent: "text-primary" },
-    { label: t("reports.totalSales"), value: fmt(summary.total), icon: TrendingUp, accent: "text-success" },
-    { label: t("reports.totalPaid"), value: fmt(summary.paid), icon: Wallet, accent: "text-chart-3" },
-    { label: t("reports.totalDue"), value: fmt(summary.due), icon: AlertCircle, accent: "text-warning" },
+    { label: t("reports.invoicesCount"), value: String(summary.count), icon: Receipt, tint: "from-primary/15 to-primary/0", color: "text-primary" },
+    { label: t("reports.totalSales"), value: fmt(summary.total), icon: TrendingUp, tint: "from-emerald-500/15 to-emerald-500/0", color: "text-emerald-600" },
+    { label: t("reports.totalPaid"), value: fmt(summary.paid), icon: Wallet, tint: "from-violet-500/15 to-violet-500/0", color: "text-violet-600" },
+    { label: t("reports.totalDue"), value: fmt(summary.due), icon: AlertCircle, tint: "from-amber-500/15 to-amber-500/0", color: "text-amber-600" },
   ];
 
   return (
     <div className="p-6 space-y-4">
       <PageHeader title={t("reports.title")} description={t("reports.description")} />
 
-      <Card>
+      <Card className="border-border/60">
         <CardContent className="pt-6 flex flex-wrap items-end gap-3">
-          <div className="grid gap-1.5"><Label>{t("reports.from")}</Label><Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
-          <div className="grid gap-1.5"><Label>{t("reports.to")}</Label><Input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></div>
+          <div className="grid gap-1.5"><Label className="text-xs text-muted-foreground">{t("reports.from")}</Label><Input type="date" className="rounded-full" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
+          <div className="grid gap-1.5"><Label className="text-xs text-muted-foreground">{t("reports.to")}</Label><Input type="date" className="rounded-full" value={to} onChange={(e) => setTo(e.target.value)} /></div>
         </CardContent>
       </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <Card key={c.label}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{c.label}</CardTitle>
-              <c.icon className={`h-5 w-5 ${c.accent}`} />
-            </CardHeader>
-            <CardContent><div className="text-2xl font-bold">{c.value}</div></CardContent>
+          <Card key={c.label} className={`bg-gradient-to-br ${c.tint} border-border/60`}>
+            <CardContent className="pt-5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground">{c.label}</span>
+                <div className={`h-9 w-9 rounded-xl bg-background/60 grid place-items-center ${c.color}`}>
+                  <c.icon className="h-4 w-4" />
+                </div>
+              </div>
+              <div className="text-2xl font-bold mt-2 tabular-nums">{c.value}</div>
+            </CardContent>
           </Card>
         ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="border-border/60">
           <CardHeader><CardTitle className="text-base">{t("reports.topProducts")}</CardTitle></CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -129,14 +133,14 @@ function Page() {
                 {topProducts.length === 0 ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-6 text-muted-foreground text-sm">{t("reports.noData")}</TableCell></TableRow>
                 ) : topProducts.map((p, i) => (
-                  <TableRow key={i}><TableCell>{p.name}</TableCell><TableCell className="text-end">{p.qty}</TableCell><TableCell className="text-end">{fmt(p.total)}</TableCell></TableRow>
+                  <TableRow key={i} className="hover:bg-muted/40"><TableCell className="font-semibold text-primary">{p.name}</TableCell><TableCell className="text-end tabular-nums">{p.qty}</TableCell><TableCell className="text-end tabular-nums">{fmt(p.total)}</TableCell></TableRow>
                 ))}
               </TableBody>
             </Table>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-border/60">
           <CardHeader><CardTitle className="text-base">{t("reports.topCustomers")}</CardTitle></CardHeader>
           <CardContent className="p-0">
             <Table>
@@ -145,7 +149,7 @@ function Page() {
                 {topCustomers.length === 0 ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-6 text-muted-foreground text-sm">{t("reports.noData")}</TableCell></TableRow>
                 ) : topCustomers.map((c, i) => (
-                  <TableRow key={i}><TableCell>{c.name}</TableCell><TableCell className="text-end">{c.count}</TableCell><TableCell className="text-end">{fmt(c.total)}</TableCell></TableRow>
+                  <TableRow key={i} className="hover:bg-muted/40"><TableCell className="font-semibold text-primary">{c.name}</TableCell><TableCell className="text-end tabular-nums">{c.count}</TableCell><TableCell className="text-end tabular-nums">{fmt(c.total)}</TableCell></TableRow>
                 ))}
               </TableBody>
             </Table>
