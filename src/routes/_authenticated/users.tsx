@@ -95,11 +95,11 @@ function Page() {
               const ur = rolesByUser.get(p.id) ?? [];
               const initials = (p.full_name || p.email || "?").slice(0, 2).toUpperCase();
               return (
-                <TableRow key={p.id}>
+                <TableRow key={p.id} className="hover:bg-muted/40">
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7"><AvatarFallback className="text-xs">{initials}</AvatarFallback></Avatar>
-                      <span className="font-medium">{p.full_name ?? "—"}</span>
+                      <Avatar className="h-8 w-8 ring-2 ring-primary/10"><AvatarFallback className="text-xs bg-gradient-to-br from-primary/20 to-primary/5 text-primary font-semibold">{initials}</AvatarFallback></Avatar>
+                      <span className="font-semibold text-primary">{p.full_name ?? "—"}</span>
                     </div>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{p.email ?? "—"}</TableCell>
@@ -107,7 +107,7 @@ function Page() {
                     <div className="flex flex-wrap gap-1">
                       {ur.length === 0 && <span className="text-xs text-muted-foreground">{t("users.noRoles")}</span>}
                       {ur.map((r) => (
-                        <Badge key={r} variant="secondary" className="gap-1">
+                        <Badge key={r} variant="secondary" className="gap-1 rounded-full">
                           {t(`roles.${r}`)}
                           {isAdmin && (
                             <button onClick={() => { if (confirm(t("common.deleteConfirm"))) removeRole.mutate({ userId: p.id, role: r }); }} className="hover:text-destructive">

@@ -121,8 +121,8 @@ function Page() {
             ) : rows.map((r) => {
               const parent = rows.find((x) => x.id === r.parent_id);
               return (
-                <TableRow key={r.id}>
-                  <TableCell className="font-medium">{r.name_ar}</TableCell>
+                <TableRow key={r.id} className="hover:bg-muted/40">
+                  <TableCell className="font-semibold text-primary">{r.name_ar}</TableCell>
                   <TableCell className="text-muted-foreground">{r.name_en ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{parent ? label(parent) : "—"}</TableCell>
                   <TableCell className="text-end">
