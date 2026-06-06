@@ -39,7 +39,7 @@ export const exportFullBackup = createServerFn({ method: "POST" })
     const out: Record<string, any[]> = {};
     const counts: Record<string, number> = {};
     for (const t of BACKUP_TABLES) {
-      const { data, error } = await supabaseAdmin.from(t).select("*");
+      const { data, error } = await (supabaseAdmin as any).from(t).select("*");
       if (error) { out[t] = []; counts[t] = 0; continue; }
       out[t] = data ?? [];
       counts[t] = (data ?? []).length;
