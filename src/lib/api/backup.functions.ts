@@ -66,11 +66,11 @@ export const exportTableCsv = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await (supabaseAdmin as any).from(data.table).select("*");
     if (error) throw new Error(error.message);
-    const list = rows ?? [];
+    const list: any[] = (rows as any[]) ?? [];
     if (list.length === 0) return { csv: "", count: 0 };
-    const headers = Array.from(
-      list.reduce<Set<string>>((s, r) => { Object.keys(r as any).forEach((k) => s.add(k)); return s; }, new Set())
-    );
+    const headerSet = new Set<string>();
+    list.forEach((r) => Object.keys(r).forEach((k) => headerSet.add(k)));
+    const headers: string[] = Array.from(headerSet);
     const esc = (v: any) => {
       if (v === null || v === undefined) return "";
       const s = typeof v === "object" ? JSON.stringify(v) : String(v);
