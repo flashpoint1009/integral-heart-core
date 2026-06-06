@@ -1512,7 +1512,13 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "manager" | "cashier" | "accountant"
+      app_role:
+        | "admin"
+        | "manager"
+        | "cashier"
+        | "accountant"
+        | "sales_rep"
+        | "supervisor"
       invoice_status: "draft" | "confirmed" | "paid" | "partial" | "cancelled"
       movement_type: "purchase" | "sale" | "transfer" | "adjustment" | "return"
       payment_kind: "cash" | "card" | "bank" | "credit" | "other"
@@ -1643,7 +1649,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "manager", "cashier", "accountant"],
+      app_role: [
+        "admin",
+        "manager",
+        "cashier",
+        "accountant",
+        "sales_rep",
+        "supervisor",
+      ],
       invoice_status: ["draft", "confirmed", "paid", "partial", "cancelled"],
       movement_type: ["purchase", "sale", "transfer", "adjustment", "return"],
       payment_kind: ["cash", "card", "bank", "credit", "other"],
