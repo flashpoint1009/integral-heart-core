@@ -59,12 +59,71 @@
     "search": "Search",
     "language": "Language",
     "darkMode": "Dark Mode",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "deleteConfirm": "Are you sure? This action cannot be undone.",
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "empty": "No data",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "all": "All",
+    "none": "None",
+    "error": "Something went wrong"
   },
   "roles": {
     "admin": "Administrator",
     "manager": "Manager",
     "cashier": "Cashier",
     "accountant": "Accountant"
+  },
+  "categories": {
+    "title": "Categories",
+    "add": "Add Category",
+    "edit": "Edit Category",
+    "name_ar": "Arabic Name",
+    "name_en": "English Name",
+    "parent": "Parent Category"
+  },
+  "warehouses": {
+    "title": "Warehouses",
+    "add": "Add Warehouse",
+    "edit": "Edit Warehouse",
+    "name": "Warehouse Name",
+    "code": "Code",
+    "address": "Address",
+    "is_default": "Default Warehouse"
+  },
+  "products": {
+    "title": "Products",
+    "add": "Add Product",
+    "edit": "Edit Product",
+    "name_ar": "Arabic Name",
+    "name_en": "English Name",
+    "sku": "SKU",
+    "barcode": "Barcode",
+    "category": "Category",
+    "cost_price": "Cost Price",
+    "sale_price": "Sale Price",
+    "tax_rate": "Tax %",
+    "unit": "Unit",
+    "min_stock": "Min Stock",
+    "description": "Description",
+    "image_url": "Image URL"
+  },
+  "inventory": {
+    "title": "Inventory",
+    "product": "Product",
+    "warehouse": "Warehouse",
+    "quantity": "Quantity",
+    "adjust": "Adjust Stock",
+    "new_quantity": "New Quantity",
+    "reason": "Reason / Note",
+    "low": "Low",
+    "ok": "OK",
+    "filterWarehouse": "Filter by Warehouse"
   }
 }
