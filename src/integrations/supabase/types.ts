@@ -378,7 +378,9 @@ export type Database = {
         Row: {
           address: string | null
           allowances: number
+          annual_leave_balance: number
           base_salary: number
+          casual_leave_balance: number
           created_at: string
           department: string | null
           email: string | null
@@ -386,18 +388,24 @@ export type Database = {
           full_name: string
           hire_date: string | null
           id: string
+          insurance_employee_pct: number
+          insurance_employer_pct: number
           is_active: boolean
           national_id: string | null
           notes: string | null
           phone: string | null
           position: string | null
+          sick_leave_balance: number
+          transport_allowance: number
           updated_at: string
           user_id: string | null
         }
         Insert: {
           address?: string | null
           allowances?: number
+          annual_leave_balance?: number
           base_salary?: number
+          casual_leave_balance?: number
           created_at?: string
           department?: string | null
           email?: string | null
@@ -405,18 +413,24 @@ export type Database = {
           full_name: string
           hire_date?: string | null
           id?: string
+          insurance_employee_pct?: number
+          insurance_employer_pct?: number
           is_active?: boolean
           national_id?: string | null
           notes?: string | null
           phone?: string | null
           position?: string | null
+          sick_leave_balance?: number
+          transport_allowance?: number
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           address?: string | null
           allowances?: number
+          annual_leave_balance?: number
           base_salary?: number
+          casual_leave_balance?: number
           created_at?: string
           department?: string | null
           email?: string | null
@@ -424,11 +438,15 @@ export type Database = {
           full_name?: string
           hire_date?: string | null
           id?: string
+          insurance_employee_pct?: number
+          insurance_employer_pct?: number
           is_active?: boolean
           national_id?: string | null
           notes?: string | null
           phone?: string | null
           position?: string | null
+          sick_leave_balance?: number
+          transport_allowance?: number
           updated_at?: string
           user_id?: string | null
         }
@@ -759,7 +777,10 @@ export type Database = {
       }
       payroll_items: {
         Row: {
+          absence_days: number
+          absence_deduction: number
           account_id: string | null
+          advance_deduction: number
           allowances: number
           base_salary: number
           bonuses: number
@@ -767,13 +788,20 @@ export type Database = {
           deductions: number
           employee_id: string
           id: string
+          incentives: number
+          insurance: number
           net_salary: number
           notes: string | null
           paid: boolean
+          penalties_total: number
           run_id: string
+          transport_allowance: number
         }
         Insert: {
+          absence_days?: number
+          absence_deduction?: number
           account_id?: string | null
+          advance_deduction?: number
           allowances?: number
           base_salary?: number
           bonuses?: number
@@ -781,13 +809,20 @@ export type Database = {
           deductions?: number
           employee_id: string
           id?: string
+          incentives?: number
+          insurance?: number
           net_salary?: number
           notes?: string | null
           paid?: boolean
+          penalties_total?: number
           run_id: string
+          transport_allowance?: number
         }
         Update: {
+          absence_days?: number
+          absence_deduction?: number
           account_id?: string | null
+          advance_deduction?: number
           allowances?: number
           base_salary?: number
           bonuses?: number
@@ -795,10 +830,14 @@ export type Database = {
           deductions?: number
           employee_id?: string
           id?: string
+          incentives?: number
+          insurance?: number
           net_salary?: number
           notes?: string | null
           paid?: boolean
+          penalties_total?: number
           run_id?: string
+          transport_allowance?: number
         }
         Relationships: [
           {
@@ -853,6 +892,47 @@ export type Database = {
           total_net?: number
         }
         Relationships: []
+      }
+      penalties: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          date: string
+          employee_id: string
+          id: string
+          notes: string | null
+          reason: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          employee_id: string
+          id?: string
+          notes?: string | null
+          reason: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          date?: string
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "penalties_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
@@ -951,6 +1031,59 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      salary_advances: {
+        Row: {
+          amount: number
+          created_at: string
+          employee_id: string
+          id: string
+          installments: number
+          monthly_deduction: number
+          reason: string | null
+          remaining: number
+          request_date: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          employee_id: string
+          id?: string
+          installments?: number
+          monthly_deduction?: number
+          reason?: string | null
+          remaining?: number
+          request_date?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          employee_id?: string
+          id?: string
+          installments?: number
+          monthly_deduction?: number
+          reason?: string | null
+          remaining?: number
+          request_date?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salary_advances_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sales_invoice_items: {
         Row: {
@@ -1285,6 +1418,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      mark_auto_absent: { Args: { p_date?: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "manager" | "cashier" | "accountant"
