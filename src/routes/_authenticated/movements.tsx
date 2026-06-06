@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_authenticated/movements")({
   component: Page,
 });
 
-type MovementType = "purchase" | "sale" | "adjustment" | "transfer_in" | "transfer_out" | "return_in" | "return_out";
+type MovementType = "purchase" | "sale" | "adjustment" | "transfer" | "return";
 type Row = {
   id: string; created_at: string; product_id: string; warehouse_id: string;
   movement_type: MovementType; quantity: number; reference_type: string | null; notes: string | null;
@@ -64,8 +64,8 @@ function Page() {
     i18n.language === "en" && r.products?.name_en ? r.products.name_en : r.products?.name_ar ?? "—";
 
   const typeVariant = (mt: MovementType): "default" | "secondary" | "destructive" | "outline" =>
-    mt === "purchase" || mt === "return_in" || mt === "transfer_in" ? "default"
-    : mt === "sale" || mt === "return_out" || mt === "transfer_out" ? "destructive"
+    mt === "purchase" ? "default"
+    : mt === "sale" ? "destructive"
     : "secondary";
 
   return (
@@ -93,7 +93,7 @@ function Page() {
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t("common.all")}</SelectItem>
-                {(["purchase","sale","adjustment","transfer_in","transfer_out","return_in","return_out"] as const).map((k) => (
+                {(["purchase","sale","adjustment","transfer","return"] as const).map((k) => (
                   <SelectItem key={k} value={k}>{t(`movements.types.${k}`)}</SelectItem>
                 ))}
               </SelectContent>
