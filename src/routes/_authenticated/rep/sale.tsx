@@ -144,7 +144,23 @@ function RepSale() {
         <Input className="ps-10 h-11 rounded-2xl" placeholder={t("rep.searchProduct")} value={search} onChange={(e) => setSearch(e.target.value)} />
       </div>
 
-      {products.length > 0 && search && (
+      {categories.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+          <button
+            onClick={() => setCategoryId("all")}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${categoryId === "all" ? "bg-primary text-primary-foreground border-primary" : "bg-card hover:bg-accent"}`}
+          >الكل</button>
+          {categories.map((c: any) => (
+            <button
+              key={c.id}
+              onClick={() => setCategoryId(c.id)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${categoryId === c.id ? "bg-primary text-primary-foreground border-primary" : "bg-card hover:bg-accent"}`}
+            >{c.name_ar}</button>
+          ))}
+        </div>
+      )}
+
+      {products.length > 0 && (search || categoryId !== "all") && (
         <div className="rounded-xl border bg-card max-h-60 overflow-auto">
           {products.map((p) => (
             <button key={p.id} onClick={() => add(p)} className="w-full px-3 py-2.5 flex justify-between items-center text-sm hover:bg-accent border-b last:border-0">
