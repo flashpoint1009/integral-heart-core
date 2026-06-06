@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
@@ -198,7 +198,6 @@ function ExpensesTab() {
       });
       if (error) throw error;
       if (form.account_id) {
-        await supabase.rpc as any;
         const acc = (accs as any[]).find((a) => a.id === form.account_id);
         if (acc) {
           const { data: cur } = await supabase.from("accounts").select("balance").eq("id", form.account_id).single();
@@ -630,5 +629,3 @@ function JournalTab() {
     </Card>
   );
 }
-
-export { isoNow };
