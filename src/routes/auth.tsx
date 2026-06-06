@@ -280,6 +280,7 @@ function AuthPage() {
 
           <p className="mt-6 text-center text-[11px] text-white/40">© {new Date().getFullYear()} {t("app.name")}</p>
         </div>
+        </div>
       </div>
     </div>
   );
