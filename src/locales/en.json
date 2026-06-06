@@ -84,7 +84,11 @@
     "cashier": "Cashier",
     "accountant": "Accountant",
     "sales_rep": "Sales Rep",
-    "supervisor": "Supervisor"
+    "supervisor": "Supervisor",
+    "developer": "Developer (Super Admin)",
+    "sales_manager": "Sales Manager",
+    "warehouse": "Warehouse Keeper",
+    "hr": "HR"
   },
   "categories": {
     "title": "Categories",

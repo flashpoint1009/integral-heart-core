@@ -84,7 +84,11 @@
     "cashier": "كاشير",
     "accountant": "محاسب",
     "sales_rep": "مندوب مبيعات",
-    "supervisor": "مشرف"
+    "supervisor": "مشرف",
+    "developer": "مطور (Super Admin)",
+    "sales_manager": "مدير مبيعات",
+    "warehouse": "أمين مخزن",
+    "hr": "موارد بشرية"
   },
   "categories": {
     "title": "الفئات",
