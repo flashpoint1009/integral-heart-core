@@ -1016,6 +1016,107 @@ export type Database = {
           },
         ]
       }
+      online_order_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          qty: number
+          total: number
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          qty: number
+          total: number
+          unit_price: number
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          qty?: number
+          total?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "online_order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "online_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "online_order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      online_orders: {
+        Row: {
+          created_at: string
+          customer_address: string
+          customer_name: string
+          customer_notes: string | null
+          customer_phone: string
+          id: string
+          order_number: string
+          payment_method: string
+          status: string
+          subtotal: number
+          tenant_id: string | null
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_address: string
+          customer_name: string
+          customer_notes?: string | null
+          customer_phone: string
+          id?: string
+          order_number: string
+          payment_method?: string
+          status?: string
+          subtotal?: number
+          tenant_id?: string | null
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_address?: string
+          customer_name?: string
+          customer_notes?: string | null
+          customer_phone?: string
+          id?: string
+          order_number?: string
+          payment_method?: string
+          status?: string
+          subtotal?: number
+          tenant_id?: string | null
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "online_orders_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_methods: {
         Row: {
           created_at: string
@@ -1816,6 +1917,53 @@ export type Database = {
             columns: ["warehouse_id"]
             isOneToOne: false
             referencedRelation: "warehouses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_config: {
+        Row: {
+          card_shape: string
+          contact_address: string | null
+          contact_phone: string | null
+          is_published: boolean
+          logo_url: string | null
+          primary_color: string
+          sections: Json
+          site_name: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          card_shape?: string
+          contact_address?: string | null
+          contact_phone?: string | null
+          is_published?: boolean
+          logo_url?: string | null
+          primary_color?: string
+          sections?: Json
+          site_name?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          card_shape?: string
+          contact_address?: string | null
+          contact_phone?: string | null
+          is_published?: boolean
+          logo_url?: string | null
+          primary_color?: string
+          sections?: Json
+          site_name?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_config_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
