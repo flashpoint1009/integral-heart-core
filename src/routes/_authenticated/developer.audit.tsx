@@ -79,7 +79,6 @@ function AuditPage() {
       <PageHeader
         title="سجل العمليات"
         description="كل عمليات الإضافة والتعديل والحذف على الجداول الحساسة"
-        icon={History}
       />
 
       <Card>
