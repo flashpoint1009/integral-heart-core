@@ -23,7 +23,7 @@ function RepLayout() {
 
   const tabs = [
     { to: "/rep", icon: Home, label: t("rep.home") },
-    { to: "/rep/route", icon: Calendar, label: t("rep.routeToday") },
+    { to: "/rep/plan", icon: Calendar, label: t("rep.routeToday") },
     { to: "/rep/customers", icon: Users, label: t("rep.customers") },
     { to: "/rep/sale", icon: ShoppingCart, label: t("rep.quickSale") },
     { to: "/rep/attendance", icon: MapPin, label: t("rep.attendance") },
