@@ -34,6 +34,7 @@ function RepSale() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paid, setPaid] = useState("0");
+  const [categoryId, setCategoryId] = useState<string>("all");
 
   useEffect(() => { if (customerParam && !customerId) setCustomerId(customerParam); }, [customerParam, customerId]);
 
@@ -52,12 +53,17 @@ function RepSale() {
     },
   });
   const { data: products = [] } = useQuery({
-    queryKey: ["rep_sale_products", search],
+    queryKey: ["rep_sale_products", search, categoryId],
     queryFn: async () => {
-      let q = supabase.from("products").select("id, name_ar, sale_price, tax_rate").eq("is_active", true).limit(20);
+      let q = supabase.from("products").select("id, name_ar, sale_price, tax_rate, category_id").eq("is_active", true).limit(30);
       if (search.trim()) q = q.ilike("name_ar", `%${search}%`);
+      if (categoryId !== "all") q = q.eq("category_id", categoryId);
       return (await q).data ?? [];
     },
+  });
+  const { data: categories = [] } = useQuery({
+    queryKey: ["rep_sale_categories"],
+    queryFn: async () => (await supabase.from("categories").select("id, name_ar").order("name_ar")).data ?? [],
   });
 
   const add = (p: { id: string; name_ar: string; sale_price: number; tax_rate: number }) => {
