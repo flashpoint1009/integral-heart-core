@@ -1,10 +1,11 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LogOut, Search, Bell } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import { LanguageToggle } from "./language-toggle";
+import { NotificationsBell } from "./notifications-bell";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,10 +42,7 @@ export function Topbar() {
       </div>
       <div className="flex-1 md:hidden" />
       <LanguageToggle />
-      <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 relative">
-        <Bell className="h-[18px] w-[18px]" />
-        <span className="absolute top-1.5 end-1.5 h-2 w-2 rounded-full bg-destructive ring-2 ring-background" />
-      </Button>
+      <NotificationsBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2 px-2 rounded-full h-10">

@@ -5,6 +5,7 @@ import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { Topbar } from "@/components/app/topbar";
 import { Loader2 } from "lucide-react";
+import { ensurePushSubscription } from "@/lib/push-client";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -18,6 +19,15 @@ function AuthLayout() {
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", replace: true });
   }, [loading, user, navigate]);
+
+  // Auto-register push subscription (once per session, only if permission granted before)
+  useEffect(() => {
+    if (!user) return;
+    if (typeof Notification === "undefined") return;
+    if (Notification.permission === "granted") {
+      void ensurePushSubscription();
+    }
+  }, [user]);
 
   if (loading || !user) {
     return (
