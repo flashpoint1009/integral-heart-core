@@ -2,16 +2,30 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "admin" | "manager" | "cashier" | "accountant" | "sales_rep" | "supervisor";
+export type Role =
+  | "admin"
+  | "manager"
+  | "cashier"
+  | "accountant"
+  | "sales_rep"
+  | "supervisor"
+  | "developer"
+  | "sales_manager"
+  | "warehouse"
+  | "hr";
 
 interface AuthCtx {
   user: User | null;
   session: Session | null;
   roles: Role[];
+  tenantId: string | null;
+  enabledModules: string[];
   loading: boolean;
   signOut: () => Promise<void>;
   hasRole: (r: Role) => boolean;
   hasAnyRole: (rs: Role[]) => boolean;
+  isDeveloper: boolean;
+  moduleEnabled: (key: string) => boolean;
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -20,28 +34,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [enabledModules, setEnabledModules] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRoles = (uid: string) => {
-      supabase
+    const fetchUserData = async (uid: string) => {
+      const { data: rolesData } = await supabase
         .from("user_roles")
-        .select("role")
-        .eq("user_id", uid)
-        .then(({ data }) => setRoles((data ?? []).map((r) => r.role as Role)));
+        .select("role, tenant_id")
+        .eq("user_id", uid);
+      const rs = (rolesData ?? []).map((r) => r.role as Role);
+      setRoles(rs);
+      const tid = (rolesData ?? []).find((r) => r.tenant_id)?.tenant_id ?? null;
+      setTenantId(tid);
+      if (tid) {
+        const { data: mods } = await supabase
+          .from("tenant_modules")
+          .select("module_key, enabled")
+          .eq("tenant_id", tid);
+        setEnabledModules(
+          (mods ?? []).filter((m) => m.enabled).map((m) => m.module_key)
+        );
+      } else {
+        setEnabledModules([]);
+      }
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) setTimeout(() => fetchRoles(s.user.id), 0);
-      else setRoles([]);
+      if (s?.user) setTimeout(() => fetchUserData(s.user.id), 0);
+      else {
+        setRoles([]);
+        setTenantId(null);
+        setEnabledModules([]);
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) fetchRoles(s.user.id);
+      if (s?.user) fetchUserData(s.user.id);
       setLoading(false);
     });
 
@@ -52,12 +86,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user,
     session,
     roles,
+    tenantId,
+    enabledModules,
     loading,
     signOut: async () => {
       await supabase.auth.signOut();
     },
     hasRole: (r) => roles.includes(r),
     hasAnyRole: (rs) => rs.some((r) => roles.includes(r)),
+    isDeveloper: roles.includes("developer"),
+    moduleEnabled: (key: string) =>
+      roles.includes("developer") || enabledModules.length === 0 || enabledModules.includes(key),
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
