@@ -26,11 +26,13 @@ import { Route as AuthenticatedMovementsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedHrRouteImport } from './routes/_authenticated/hr'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
+import { Route as AuthenticatedDeveloperRouteImport } from './routes/_authenticated/developer'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedRepRouteRouteImport } from './routes/_authenticated/rep/route'
 import { Route as AuthenticatedSupervisorIndexRouteImport } from './routes/_authenticated/supervisor.index'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep/index'
+import { Route as AuthenticatedDeveloperIndexRouteImport } from './routes/_authenticated/developer.index'
 import { Route as AuthenticatedSupervisorRoutesRouteImport } from './routes/_authenticated/supervisor.routes'
 import { Route as AuthenticatedSupervisorReportsRouteImport } from './routes/_authenticated/supervisor.reports'
 import { Route as AuthenticatedSupervisorLiveRouteImport } from './routes/_authenticated/supervisor.live'
@@ -38,6 +40,8 @@ import { Route as AuthenticatedRepSaleRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRepPlanRouteImport } from './routes/_authenticated/rep/plan'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep/customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
+import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
+import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
 import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -124,6 +128,11 @@ const AuthenticatedFinanceRoute = AuthenticatedFinanceRouteImport.update({
   path: '/finance',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedDeveloperRoute = AuthenticatedDeveloperRouteImport.update({
+  id: '/developer',
+  path: '/developer',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCustomersRoute = AuthenticatedCustomersRouteImport.update({
   id: '/customers',
   path: '/customers',
@@ -150,6 +159,12 @@ const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRepRouteRoute,
 } as any)
+const AuthenticatedDeveloperIndexRoute =
+  AuthenticatedDeveloperIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedSupervisorRoutesRoute =
   AuthenticatedSupervisorRoutesRouteImport.update({
     id: '/routes',
@@ -190,6 +205,18 @@ const AuthenticatedRepAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedRepRouteRoute,
   } as any)
+const AuthenticatedDeveloperTenantsRoute =
+  AuthenticatedDeveloperTenantsRouteImport.update({
+    id: '/tenants',
+    path: '/tenants',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
+const AuthenticatedDeveloperModulesRoute =
+  AuthenticatedDeveloperModulesRouteImport.update({
+    id: '/modules',
+    path: '/modules',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedRepVisitCustomerIdRoute =
   AuthenticatedRepVisitCustomerIdRouteImport.update({
     id: '/visit/$customerId',
@@ -203,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
+  '/developer': typeof AuthenticatedDeveloperRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/hr': typeof AuthenticatedHrRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -217,6 +245,8 @@ export interface FileRoutesByFullPath {
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -224,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/developer/': typeof AuthenticatedDeveloperIndexRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
   '/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -246,6 +277,8 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/': typeof AuthenticatedIndexRoute
+  '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -253,6 +286,7 @@ export interface FileRoutesByTo {
   '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/developer': typeof AuthenticatedDeveloperIndexRoute
   '/rep': typeof AuthenticatedRepIndexRoute
   '/supervisor': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -264,6 +298,7 @@ export interface FileRoutesById {
   '/_authenticated/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
+  '/_authenticated/developer': typeof AuthenticatedDeveloperRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/hr': typeof AuthenticatedHrRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
@@ -279,6 +314,8 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/_authenticated/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -286,6 +323,7 @@ export interface FileRoutesById {
   '/_authenticated/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/_authenticated/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/_authenticated/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/_authenticated/developer/': typeof AuthenticatedDeveloperIndexRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
   '/_authenticated/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/_authenticated/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -298,6 +336,7 @@ export interface FileRouteTypes {
     | '/rep'
     | '/categories'
     | '/customers'
+    | '/developer'
     | '/finance'
     | '/hr'
     | '/inventory'
@@ -312,6 +351,8 @@ export interface FileRouteTypes {
     | '/suppliers'
     | '/users'
     | '/warehouses'
+    | '/developer/modules'
+    | '/developer/tenants'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -319,6 +360,7 @@ export interface FileRouteTypes {
     | '/supervisor/live'
     | '/supervisor/reports'
     | '/supervisor/routes'
+    | '/developer/'
     | '/rep/'
     | '/supervisor/'
     | '/rep/visit/$customerId'
@@ -341,6 +383,8 @@ export interface FileRouteTypes {
     | '/users'
     | '/warehouses'
     | '/'
+    | '/developer/modules'
+    | '/developer/tenants'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -348,6 +392,7 @@ export interface FileRouteTypes {
     | '/supervisor/live'
     | '/supervisor/reports'
     | '/supervisor/routes'
+    | '/developer'
     | '/rep'
     | '/supervisor'
     | '/rep/visit/$customerId'
@@ -358,6 +403,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rep'
     | '/_authenticated/categories'
     | '/_authenticated/customers'
+    | '/_authenticated/developer'
     | '/_authenticated/finance'
     | '/_authenticated/hr'
     | '/_authenticated/inventory'
@@ -373,6 +419,8 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/warehouses'
     | '/_authenticated/'
+    | '/_authenticated/developer/modules'
+    | '/_authenticated/developer/tenants'
     | '/_authenticated/rep/attendance'
     | '/_authenticated/rep/customers'
     | '/_authenticated/rep/plan'
@@ -380,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/supervisor/live'
     | '/_authenticated/supervisor/reports'
     | '/_authenticated/supervisor/routes'
+    | '/_authenticated/developer/'
     | '/_authenticated/rep/'
     | '/_authenticated/supervisor/'
     | '/_authenticated/rep/visit/$customerId'
@@ -511,6 +560,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFinanceRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/developer': {
+      id: '/_authenticated/developer'
+      path: '/developer'
+      fullPath: '/developer'
+      preLoaderRoute: typeof AuthenticatedDeveloperRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/customers': {
       id: '/_authenticated/customers'
       path: '/customers'
@@ -545,6 +601,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/rep/'
       preLoaderRoute: typeof AuthenticatedRepIndexRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
+    }
+    '/_authenticated/developer/': {
+      id: '/_authenticated/developer/'
+      path: '/'
+      fullPath: '/developer/'
+      preLoaderRoute: typeof AuthenticatedDeveloperIndexRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
     }
     '/_authenticated/supervisor/routes': {
       id: '/_authenticated/supervisor/routes'
@@ -595,6 +658,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepAttendanceRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/developer/tenants': {
+      id: '/_authenticated/developer/tenants'
+      path: '/tenants'
+      fullPath: '/developer/tenants'
+      preLoaderRoute: typeof AuthenticatedDeveloperTenantsRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
+    '/_authenticated/developer/modules': {
+      id: '/_authenticated/developer/modules'
+      path: '/modules'
+      fullPath: '/developer/modules'
+      preLoaderRoute: typeof AuthenticatedDeveloperModulesRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
     '/_authenticated/rep/visit/$customerId': {
       id: '/_authenticated/rep/visit/$customerId'
       path: '/visit/$customerId'
@@ -628,6 +705,24 @@ const AuthenticatedRepRouteRouteWithChildren =
     AuthenticatedRepRouteRouteChildren,
   )
 
+interface AuthenticatedDeveloperRouteChildren {
+  AuthenticatedDeveloperModulesRoute: typeof AuthenticatedDeveloperModulesRoute
+  AuthenticatedDeveloperTenantsRoute: typeof AuthenticatedDeveloperTenantsRoute
+  AuthenticatedDeveloperIndexRoute: typeof AuthenticatedDeveloperIndexRoute
+}
+
+const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
+  {
+    AuthenticatedDeveloperModulesRoute: AuthenticatedDeveloperModulesRoute,
+    AuthenticatedDeveloperTenantsRoute: AuthenticatedDeveloperTenantsRoute,
+    AuthenticatedDeveloperIndexRoute: AuthenticatedDeveloperIndexRoute,
+  }
+
+const AuthenticatedDeveloperRouteWithChildren =
+  AuthenticatedDeveloperRoute._addFileChildren(
+    AuthenticatedDeveloperRouteChildren,
+  )
+
 interface AuthenticatedSupervisorRouteChildren {
   AuthenticatedSupervisorLiveRoute: typeof AuthenticatedSupervisorLiveRoute
   AuthenticatedSupervisorReportsRoute: typeof AuthenticatedSupervisorReportsRoute
@@ -652,6 +747,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRepRouteRoute: typeof AuthenticatedRepRouteRouteWithChildren
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
+  AuthenticatedDeveloperRoute: typeof AuthenticatedDeveloperRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedHrRoute: typeof AuthenticatedHrRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
@@ -673,6 +769,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRepRouteRoute: AuthenticatedRepRouteRouteWithChildren,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
+  AuthenticatedDeveloperRoute: AuthenticatedDeveloperRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedHrRoute: AuthenticatedHrRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
