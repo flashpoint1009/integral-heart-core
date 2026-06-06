@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/app/app-sidebar";
 import { Topbar } from "@/components/app/topbar";
 import { Loader2 } from "lucide-react";
 import { ensurePushSubscription } from "@/lib/push-client";
+import { EnableNotificationsGate } from "@/components/app/enable-notifications-gate";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -39,7 +40,9 @@ function AuthLayout() {
 
   return (
     <SidebarProvider>
-      <LayoutShell />
+      <EnableNotificationsGate>
+        <LayoutShell />
+      </EnableNotificationsGate>
     </SidebarProvider>
   );
 }
