@@ -126,6 +126,11 @@ function Page() {
     queryFn: async () => (await supabase.from("warehouses").select("id,name,is_default").eq("is_active", true).order("name")).data ?? [],
   });
 
+  const { data: company } = useQuery({
+    queryKey: ["company_settings"],
+    queryFn: async () => (await supabase.from("company_settings").select("*").limit(1).maybeSingle()).data,
+  });
+
   const { data: products = [] } = useQuery({
     queryKey: ["products", "active"],
     queryFn: async () => (await supabase.from("products").select("id,name_ar,name_en,sale_price,tax_rate").eq("is_active", true).order("name_ar")).data as Product[] ?? [],
