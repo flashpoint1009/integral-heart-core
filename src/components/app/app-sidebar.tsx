@@ -29,6 +29,7 @@ import {
   Package2,
   Bell,
   Palette,
+  Database,
 } from "lucide-react";
 import {
   Sidebar,
