@@ -903,3 +903,120 @@ function PayrollTab() {
     </div>
   );
 }
+
+/* -------- Bonuses / Incentives -------- */
+function BonusesTab() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [period, setPeriod] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 7); });
+  const [form, setForm] = useState({ employee_id: "", bonus_type: "incentive", amount: "0", reason: "" });
+
+  const periodDate = period + "-01";
+  const { data: employees = [] } = useQuery({ queryKey: ["employees"], queryFn: async () => (await supabase.from("employees").select("id,full_name").eq("is_active", true).order("full_name")).data ?? [] });
+  const { data: rows = [] } = useQuery({
+    queryKey: ["bonuses", periodDate],
+    queryFn: async () => (await supabase.from("bonuses").select("*, employees(full_name)").eq("period_month", periodDate).order("created_at", { ascending: false })).data ?? [],
+  });
+
+  const totals = useMemo(() => {
+    let bonus = 0, incentive = 0;
+    for (const r of rows as any[]) {
+      if (r.bonus_type === "bonus") bonus += Number(r.amount || 0);
+      else incentive += Number(r.amount || 0);
+    }
+    return { bonus, incentive, total: bonus + incentive };
+  }, [rows]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!form.employee_id || Number(form.amount) <= 0) throw new Error("invalid");
+      const { error } = await supabase.from("bonuses").insert({
+        employee_id: form.employee_id, period_month: periodDate,
+        bonus_type: form.bonus_type, amount: Number(form.amount), reason: form.reason || null,
+        created_by: user?.id ?? null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success(t("common.saved")); qc.invalidateQueries({ queryKey: ["bonuses"] }); setOpen(false); setForm({ employee_id: "", bonus_type: "incentive", amount: "0", reason: "" }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("bonuses").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["bonuses"] }); toast.success(t("common.deleted")); },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label={t("hr.bonuses")} value={fmt(totals.bonus)} icon={Gift} tint="from-amber-500/10 to-amber-500/0" color="text-amber-600" />
+        <StatCard label={t("hr.incentives")} value={fmt(totals.incentive)} icon={Zap} tint="from-emerald-500/10 to-emerald-500/0" color="text-emerald-600" />
+        <StatCard label={t("hr.total")} value={fmt(totals.total)} icon={Wallet} tint="from-primary/10 to-primary/0" color="text-primary" />
+      </div>
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div className="grid gap-1.5"><Label>{t("hr.period")}</Label><Input type="month" className="rounded-full" value={period} onChange={(e) => setPeriod(e.target.value)} /></div>
+        <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4 me-2" />{t("hr.addBonus")}</Button>
+      </div>
+      <div className="rounded-md border bg-card overflow-x-auto">
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead>{t("hr.employee")}</TableHead>
+            <TableHead>{t("hr.bonusType")}</TableHead>
+            <TableHead className="text-end">{t("hr.amount")}</TableHead>
+            <TableHead>{t("hr.reason")}</TableHead>
+            <TableHead className="text-end">{t("common.actions")}</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>
+            {(rows as any[]).length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
+            ) : (rows as any[]).map((r: any) => (
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">{r.employees?.full_name}</TableCell>
+                <TableCell><Badge variant="outline" className="rounded-full">{t(`hr.bonusTypes.${r.bonus_type}`)}</Badge></TableCell>
+                <TableCell className="text-end tabular-nums font-semibold text-emerald-700">{fmt(Number(r.amount))}</TableCell>
+                <TableCell className="text-muted-foreground text-sm">{r.reason || "—"}</TableCell>
+                <TableCell className="text-end">
+                  <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("hr.addBonus")}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>{t("hr.employee")} *</Label>
+              <Select value={form.employee_id} onValueChange={(v) => setForm({ ...form, employee_id: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{(employees as any[]).map((e) => <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>{t("hr.bonusType")} *</Label>
+                <Select value={form.bonus_type} onValueChange={(v) => setForm({ ...form, bonus_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="incentive">{t("hr.bonusTypes.incentive")}</SelectItem>
+                    <SelectItem value="bonus">{t("hr.bonusTypes.bonus")}</SelectItem>
+                    <SelectItem value="overtime">{t("hr.bonusTypes.overtime")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div><Label>{t("hr.amount")} *</Label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+            </div>
+            <div><Label>{t("hr.reason")}</Label><Textarea rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={() => save.mutate()} disabled={save.isPending || !form.employee_id || Number(form.amount) <= 0}>{t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
