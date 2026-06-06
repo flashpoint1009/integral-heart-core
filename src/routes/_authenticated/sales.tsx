@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { createSale } from "@/lib/api/sales.functions";
+import { recordPayment } from "@/lib/api/payments.functions";
 import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Eye, Printer, Wallet } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/sales")({
@@ -39,7 +40,13 @@ function Page() {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
   const createSaleFn = useServerFn(createSale);
+  const recordPaymentFn = useServerFn(recordPayment);
   const [open, setOpen] = useState(false);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [payOpen, setPayOpen] = useState(false);
+  const [payAmount, setPayAmount] = useState("0");
+  const [payMethodId, setPayMethodId] = useState<string>("");
+  const [payNotes, setPayNotes] = useState("");
 
   const { data: invoices = [], isLoading } = useQuery({
     queryKey: ["sales_invoices"],
@@ -56,6 +63,55 @@ function Page() {
   });
 
   const customerName = (id: string | null) => customers.find((c) => c.id === id)?.name ?? t("sales.walkin");
+
+  const { data: paymentMethods = [] } = useQuery({
+    queryKey: ["payment_methods", "active"],
+    queryFn: async () => (await supabase.from("payment_methods").select("id,name").eq("is_active", true).order("name")).data ?? [],
+  });
+
+  const { data: detail } = useQuery({
+    queryKey: ["invoice_detail", detailId],
+    queryFn: async () => {
+      if (!detailId) return null;
+      const [inv, items, pays] = await Promise.all([
+        supabase.from("sales_invoices").select("*, customers(name, phone, address)").eq("id", detailId).single(),
+        supabase.from("sales_invoice_items").select("*, products(name_ar, name_en, sku)").eq("invoice_id", detailId),
+        supabase.from("payments").select("*, payment_methods(name)").eq("invoice_id", detailId).order("payment_date", { ascending: false }),
+      ]);
+      if (inv.error) throw inv.error;
+      return {
+        invoice: inv.data as Invoice & { customers: { name: string; phone: string | null; address: string | null } | null; notes: string | null; subtotal: number; tax_total: number; discount: number },
+        items: (items.data ?? []) as Array<{ id: string; quantity: number; unit_price: number; discount: number; tax_rate: number; total: number; products: { name_ar: string; name_en: string | null; sku: string | null } | null }>,
+        payments: (pays.data ?? []) as Array<{ id: string; amount: number; payment_date: string; notes: string | null; payment_methods: { name: string } | null }>,
+      };
+    },
+    enabled: !!detailId,
+  });
+
+  const submitPayment = useMutation({
+    mutationFn: async () => {
+      if (!detailId) return;
+      return await recordPaymentFn({
+        data: {
+          invoice_id: detailId,
+          amount: Number(payAmount),
+          payment_method_id: payMethodId || null,
+          notes: payNotes || null,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success(t("common.saved"));
+      qc.invalidateQueries({ queryKey: ["sales_invoices"] });
+      qc.invalidateQueries({ queryKey: ["invoice_detail", detailId] });
+      setPayOpen(false); setPayAmount("0"); setPayNotes("");
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const printInvoice = () => {
+    if (typeof window !== "undefined") window.print();
+  };
 
   // New invoice form state
   const [warehouseId, setWarehouseId] = useState<string>("");
@@ -159,7 +215,7 @@ function Page() {
             ) : invoices.length === 0 ? (
               <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
             ) : invoices.map((inv) => (
-              <TableRow key={inv.id}>
+              <TableRow key={inv.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setDetailId(inv.id)}>
                 <TableCell className="font-mono font-medium">{inv.invoice_number}</TableCell>
                 <TableCell className="text-muted-foreground">{new Date(inv.invoice_date).toLocaleString()}</TableCell>
                 <TableCell>{customerName(inv.customer_id)}</TableCell>
@@ -261,6 +317,128 @@ function Page() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
             <Button onClick={() => submit.mutate()} disabled={submit.isPending}>{t("sales.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!detailId} onOpenChange={(o) => !o && setDetailId(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto print:shadow-none">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between gap-2">
+              <span>{t("invoice.details")}{detail?.invoice ? ` — ${detail.invoice.invoice_number}` : ""}</span>
+              <div className="flex gap-2 print:hidden">
+                <Button size="sm" variant="outline" onClick={printInvoice}><Printer className="h-4 w-4 me-1" />{t("invoice.print")}</Button>
+                {detail?.invoice && detail.invoice.status !== "paid" && detail.invoice.status !== "cancelled" && (
+                  <Button size="sm" onClick={() => { const due = Number(detail.invoice.total) - Number(detail.invoice.paid); setPayAmount(due.toFixed(2)); setPayMethodId(paymentMethods[0]?.id ?? ""); setPayOpen(true); }}>
+                    <Wallet className="h-4 w-4 me-1" />{t("payments.add")}
+                  </Button>
+                )}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          {detail ? (
+            <div id="invoice-print" className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-muted-foreground text-xs">{t("sales.customer")}</div>
+                  <div className="font-medium">{detail.invoice.customers?.name ?? t("sales.walkin")}</div>
+                  {detail.invoice.customers?.phone && <div className="text-xs text-muted-foreground">{detail.invoice.customers.phone}</div>}
+                </div>
+                <div className="text-end">
+                  <div className="text-muted-foreground text-xs">{t("sales.date")}</div>
+                  <div className="font-medium">{new Date(detail.invoice.invoice_date).toLocaleString()}</div>
+                  <Badge variant={statusVariant[detail.invoice.status]} className="mt-1">{t(`sales.statuses.${detail.invoice.status}`)}</Badge>
+                </div>
+              </div>
+
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t("sales.product")}</TableHead>
+                      <TableHead className="text-end">{t("sales.qty")}</TableHead>
+                      <TableHead className="text-end">{t("sales.price")}</TableHead>
+                      <TableHead className="text-end">{t("sales.lineTotal")}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {detail.items.map((it) => (
+                      <TableRow key={it.id}>
+                        <TableCell>{i18n.language === "en" && it.products?.name_en ? it.products.name_en : it.products?.name_ar ?? "—"}</TableCell>
+                        <TableCell className="text-end tabular-nums">{Number(it.quantity)}</TableCell>
+                        <TableCell className="text-end tabular-nums">{fmt(Number(it.unit_price))}</TableCell>
+                        <TableCell className="text-end tabular-nums">{fmt(Number(it.total))}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+
+              <div className="flex justify-end">
+                <div className="w-64 space-y-1">
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("sales.subtotal")}</span><span className="tabular-nums">{fmt(Number(detail.invoice.subtotal))}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("sales.discountTotal")}</span><span className="tabular-nums">−{fmt(Number(detail.invoice.discount))}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">{t("sales.taxTotal")}</span><span className="tabular-nums">{fmt(Number(detail.invoice.tax_total))}</span></div>
+                  <div className="flex justify-between font-bold text-base border-t pt-2"><span>{t("sales.total")}</span><span className="tabular-nums">{fmt(Number(detail.invoice.total))}</span></div>
+                  <div className="flex justify-between text-success"><span>{t("sales.paid")}</span><span className="tabular-nums">{fmt(Number(detail.invoice.paid))}</span></div>
+                  <div className="flex justify-between text-warning"><span>{t("payments.remaining")}</span><span className="tabular-nums">{fmt(Number(detail.invoice.total) - Number(detail.invoice.paid))}</span></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="font-semibold mb-2">{t("payments.title")}</div>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t("payments.date")}</TableHead>
+                        <TableHead>{t("payments.method")}</TableHead>
+                        <TableHead className="text-end">{t("payments.amount")}</TableHead>
+                        <TableHead>{t("payments.notes")}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {detail.payments.length === 0 ? (
+                        <TableRow><TableCell colSpan={4} className="text-center py-4 text-muted-foreground text-sm">{t("payments.noPayments")}</TableCell></TableRow>
+                      ) : detail.payments.map((p) => (
+                        <TableRow key={p.id}>
+                          <TableCell className="text-xs text-muted-foreground">{new Date(p.payment_date).toLocaleString()}</TableCell>
+                          <TableCell>{p.payment_methods?.name ?? "—"}</TableCell>
+                          <TableCell className="text-end tabular-nums">{fmt(Number(p.amount))}</TableCell>
+                          <TableCell className="text-xs">{p.notes ?? "—"}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">{t("common.loading")}</div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={payOpen} onOpenChange={setPayOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>{t("payments.add")}</DialogTitle></DialogHeader>
+          <div className="grid gap-3">
+            <div className="grid gap-1.5">
+              <Label>{t("payments.method")}</Label>
+              <Select value={payMethodId || "none"} onValueChange={(v) => setPayMethodId(v === "none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">—</SelectItem>
+                  {paymentMethods.map((m) => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-1.5"><Label>{t("payments.amount")}</Label><Input type="number" step="0.01" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} /></div>
+            <div className="grid gap-1.5"><Label>{t("payments.notes")}</Label><Input value={payNotes} onChange={(e) => setPayNotes(e.target.value)} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPayOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={() => submitPayment.mutate()} disabled={submitPayment.isPending || Number(payAmount) <= 0}>{t("common.save")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
