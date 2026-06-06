@@ -64,7 +64,7 @@ export const exportTableCsv = createServerFn({ method: "POST" })
       throw new Error("Unknown table");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin.from(data.table).select("*");
+    const { data: rows, error } = await (supabaseAdmin as any).from(data.table).select("*");
     if (error) throw new Error(error.message);
     const list = rows ?? [];
     if (list.length === 0) return { csv: "", count: 0 };
@@ -100,9 +100,9 @@ export const restoreFromJson = createServerFn({ method: "POST" })
       if (!Array.isArray(rows) || rows.length === 0) continue;
       try {
         if (data.mode === "replace") {
-          await supabaseAdmin.from(t).delete().neq("id", "00000000-0000-0000-0000-000000000000");
+          await (supabaseAdmin as any).from(t).delete().neq("id", "00000000-0000-0000-0000-000000000000");
         }
-        const { error } = await supabaseAdmin.from(t).upsert(rows as any, { onConflict: "id" });
+        const { error } = await (supabaseAdmin as any).from(t).upsert(rows, { onConflict: "id" });
         if (error) results.push({ table: t, inserted: 0, error: error.message });
         else results.push({ table: t, inserted: rows.length });
       } catch (e: any) {
