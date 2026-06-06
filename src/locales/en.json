@@ -239,5 +239,40 @@
     "qty": "Qty",
     "total": "Total",
     "noData": "No data in this period"
+  },
+  "movements": {
+    "title": "Stock Movements",
+    "description": "Full audit log of every stock in/out movement",
+    "date": "Date",
+    "product": "Product",
+    "warehouse": "Warehouse",
+    "type": "Type",
+    "qty": "Qty",
+    "reference": "Reference",
+    "notes": "Notes",
+    "types": {
+      "purchase": "Purchase",
+      "sale": "Sale",
+      "adjustment": "Adjustment",
+      "transfer_in": "Transfer In",
+      "transfer_out": "Transfer Out",
+      "return_in": "Return In",
+      "return_out": "Return Out"
+    }
+  },
+  "payments": {
+    "title": "Payments",
+    "add": "Record Payment",
+    "method": "Payment Method",
+    "amount": "Amount",
+    "date": "Date",
+    "notes": "Notes",
+    "remaining": "Remaining",
+    "noPayments": "No payments yet"
+  },
+  "invoice": {
+    "details": "Invoice Details",
+    "print": "Print",
+    "items": "Items"
   }
 }
