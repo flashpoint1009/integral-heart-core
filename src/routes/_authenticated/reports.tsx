@@ -8,7 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Receipt, TrendingUp, Wallet, AlertCircle } from "lucide-react";
+import { Receipt, TrendingUp, Wallet, AlertCircle, FileSpreadsheet, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { exportToExcel, exportToPdf } from "@/lib/export-utils";
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+} from "recharts";
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({ meta: [{ title: "Reports — ERP" }] }),
@@ -34,11 +39,11 @@ function Page() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sales_invoices")
-        .select("id, total, paid, customer_id, customers(name)")
+        .select("id, invoice_date, total, paid, customer_id, customers(name)")
         .gte("invoice_date", range.fromISO)
         .lte("invoice_date", range.toISO);
       if (error) throw error;
-      return (data ?? []) as unknown as Array<{ id: string; total: number; paid: number; customer_id: string | null; customers: { name: string } | null }>;
+      return (data ?? []) as unknown as Array<{ id: string; invoice_date: string; total: number; paid: number; customer_id: string | null; customers: { name: string } | null }>;
     },
   });
 
@@ -87,7 +92,61 @@ function Page() {
     return [...map.values()].sort((a, b) => b.total - a.total).slice(0, 10);
   }, [invoices, t]);
 
+  const trend = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const i of invoices) {
+      const d = (i.invoice_date || "").slice(0, 10);
+      if (!d) continue;
+      map.set(d, (map.get(d) ?? 0) + Number(i.total || 0));
+    }
+    return [...map.entries()].sort(([a],[b]) => a.localeCompare(b)).map(([date, total]) => ({ date, total }));
+  }, [invoices]);
+
   const fmt = (n: number) => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const handleExcel = () => {
+    exportToExcel(`reports_${from}_${to}`, {
+      "ملخص": [
+        { المعيار: t("reports.invoicesCount"), القيمة: summary.count },
+        { المعيار: t("reports.totalSales"), القيمة: summary.total },
+        { المعيار: t("reports.totalPaid"), القيمة: summary.paid },
+        { المعيار: t("reports.totalDue"), القيمة: summary.due },
+      ],
+      "اتجاه المبيعات": trend.map((r) => ({ التاريخ: r.date, الإجمالي: r.total })),
+      "أعلى المنتجات": topProducts.map((p) => ({ المنتج: p.name, الكمية: p.qty, الإجمالي: p.total })),
+      "أعلى العملاء": topCustomers.map((c) => ({ العميل: c.name, "عدد الفواتير": c.count, الإجمالي: c.total })),
+    });
+  };
+
+  const handlePdf = () => {
+    exportToPdf({
+      filename: `reports_${from}_${to}`,
+      title: t("reports.title"),
+      subtitle: `${from} → ${to}`,
+      sections: [
+        {
+          heading: "Summary",
+          headers: ["Metric", "Value"],
+          rows: [
+            [t("reports.invoicesCount"), summary.count],
+            [t("reports.totalSales"), fmt(summary.total)],
+            [t("reports.totalPaid"), fmt(summary.paid)],
+            [t("reports.totalDue"), fmt(summary.due)],
+          ],
+        },
+        {
+          heading: "Top Products",
+          headers: ["Product", "Qty", "Total"],
+          rows: topProducts.map((p) => [p.name, p.qty, fmt(p.total)]),
+        },
+        {
+          heading: "Top Customers",
+          headers: ["Customer", "Invoices", "Total"],
+          rows: topCustomers.map((c) => [c.name, c.count, fmt(c.total)]),
+        },
+      ],
+    });
+  };
 
   const cards = [
     { label: t("reports.invoicesCount"), value: String(summary.count), icon: Receipt, tint: "from-primary/15 to-primary/0", color: "text-primary" },
@@ -104,6 +163,10 @@ function Page() {
         <CardContent className="pt-6 flex flex-wrap items-end gap-3">
           <div className="grid gap-1.5"><Label className="text-xs text-muted-foreground">{t("reports.from")}</Label><Input type="date" className="rounded-full" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
           <div className="grid gap-1.5"><Label className="text-xs text-muted-foreground">{t("reports.to")}</Label><Input type="date" className="rounded-full" value={to} onChange={(e) => setTo(e.target.value)} /></div>
+          <div className="ms-auto flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleExcel} className="gap-2"><FileSpreadsheet className="h-4 w-4" /> Excel</Button>
+            <Button variant="outline" size="sm" onClick={handlePdf} className="gap-2"><FileText className="h-4 w-4" /> PDF</Button>
+          </div>
         </CardContent>
       </Card>
 
@@ -122,6 +185,25 @@ function Page() {
           </Card>
         ))}
       </div>
+
+      <Card className="border-border/60">
+        <CardHeader><CardTitle className="text-base">اتجاه المبيعات اليومي</CardTitle></CardHeader>
+        <CardContent className="h-72">
+          {trend.length === 0 ? (
+            <div className="h-full grid place-items-center text-muted-foreground text-sm">{t("reports.noData")}</div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={trend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                <XAxis dataKey="date" fontSize={11} />
+                <YAxis fontSize={11} />
+                <Tooltip formatter={(v: any) => fmt(Number(v))} />
+                <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="border-border/60">
