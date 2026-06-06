@@ -102,14 +102,20 @@ function Builder() {
 
   return (
     <div className="p-4 md:p-6">
-      <PageHeader title="بناء الموقع" description="اسحب وأفلت الأقسام لترتيب صفحة المتجر">
-        <Link to="/shop" target="_blank" className="inline-flex items-center gap-2 text-sm underline">
-          <ExternalLink className="h-4 w-4" /> معاينة المتجر
-        </Link>
-        <Button onClick={() => m.mutate()} disabled={m.isPending}>
-          <Save className="h-4 w-4 me-1" /> حفظ
-        </Button>
-      </PageHeader>
+      <PageHeader
+        title="بناء الموقع"
+        description="اسحب وأفلت الأقسام لترتيب صفحة المتجر"
+        actions={
+          <div className="flex items-center gap-2">
+            <a href="/shop" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm underline">
+              <ExternalLink className="h-4 w-4" /> معاينة المتجر
+            </a>
+            <Button onClick={() => m.mutate()} disabled={m.isPending}>
+              <Save className="h-4 w-4 me-1" /> حفظ
+            </Button>
+          </div>
+        }
+      />
 
       <div className="grid lg:grid-cols-[280px_1fr_320px] gap-4 mt-4">
         {/* Left: Section palette + settings */}
