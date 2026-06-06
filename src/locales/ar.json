@@ -59,12 +59,71 @@
     "search": "بحث",
     "language": "اللغة",
     "darkMode": "الوضع الليلي",
-    "comingSoon": "قريباً"
+    "comingSoon": "قريباً",
+    "actions": "إجراءات",
+    "confirm": "تأكيد",
+    "deleteConfirm": "متأكد إنك عايز تحذف؟ مش هينفع التراجع.",
+    "saved": "تم الحفظ",
+    "deleted": "تم الحذف",
+    "empty": "لا يوجد بيانات",
+    "yes": "نعم",
+    "no": "لا",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "all": "الكل",
+    "none": "بدون",
+    "error": "حصل خطأ"
   },
   "roles": {
     "admin": "مدير النظام",
     "manager": "مدير",
     "cashier": "كاشير",
     "accountant": "محاسب"
+  },
+  "categories": {
+    "title": "الفئات",
+    "add": "إضافة فئة",
+    "edit": "تعديل فئة",
+    "name_ar": "الاسم بالعربي",
+    "name_en": "الاسم بالإنجليزي",
+    "parent": "الفئة الأم"
+  },
+  "warehouses": {
+    "title": "المخازن",
+    "add": "إضافة مخزن",
+    "edit": "تعديل مخزن",
+    "name": "اسم المخزن",
+    "code": "الكود",
+    "address": "العنوان",
+    "is_default": "المخزن الافتراضي"
+  },
+  "products": {
+    "title": "المنتجات",
+    "add": "إضافة منتج",
+    "edit": "تعديل منتج",
+    "name_ar": "الاسم بالعربي",
+    "name_en": "الاسم بالإنجليزي",
+    "sku": "كود المنتج (SKU)",
+    "barcode": "الباركود",
+    "category": "الفئة",
+    "cost_price": "سعر التكلفة",
+    "sale_price": "سعر البيع",
+    "tax_rate": "نسبة الضريبة %",
+    "unit": "الوحدة",
+    "min_stock": "الحد الأدنى للمخزون",
+    "description": "الوصف",
+    "image_url": "رابط الصورة"
+  },
+  "inventory": {
+    "title": "المخزون",
+    "product": "المنتج",
+    "warehouse": "المخزن",
+    "quantity": "الكمية",
+    "adjust": "تعديل المخزون",
+    "new_quantity": "الكمية الجديدة",
+    "reason": "السبب / ملاحظة",
+    "low": "منخفض",
+    "ok": "متوفر",
+    "filterWarehouse": "فلتر بالمخزن"
   }
 }
