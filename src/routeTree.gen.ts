@@ -48,8 +48,10 @@ import { Route as AuthenticatedRepRequestsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedRepPlanRouteImport } from './routes/_authenticated/rep/plan'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep/customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
+import { Route as AuthenticatedNotificationsSendRouteImport } from './routes/_authenticated/notifications.send'
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
+import { Route as AuthenticatedDeveloperBrandingRouteImport } from './routes/_authenticated/developer.branding'
 import { Route as AuthenticatedDeveloperAuditRouteImport } from './routes/_authenticated/developer.audit'
 import { Route as AuthenticatedDashboardRepsRouteImport } from './routes/_authenticated/dashboard.reps'
 import { Route as AuthenticatedDashboardProfitabilityRouteImport } from './routes/_authenticated/dashboard.profitability'
@@ -263,6 +265,12 @@ const AuthenticatedRepAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedRepRouteRoute,
   } as any)
+const AuthenticatedNotificationsSendRoute =
+  AuthenticatedNotificationsSendRouteImport.update({
+    id: '/notifications/send',
+    path: '/notifications/send',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDeveloperTenantsRoute =
   AuthenticatedDeveloperTenantsRouteImport.update({
     id: '/tenants',
@@ -273,6 +281,12 @@ const AuthenticatedDeveloperModulesRoute =
   AuthenticatedDeveloperModulesRouteImport.update({
     id: '/modules',
     path: '/modules',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
+const AuthenticatedDeveloperBrandingRoute =
+  AuthenticatedDeveloperBrandingRouteImport.update({
+    id: '/branding',
+    path: '/branding',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
 const AuthenticatedDeveloperAuditRoute =
@@ -344,8 +358,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
+  '/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -388,8 +404,10 @@ export interface FileRoutesByTo {
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
+  '/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -438,8 +456,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/_authenticated/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/_authenticated/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/_authenticated/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
+  '/_authenticated/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/_authenticated/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -488,8 +508,10 @@ export interface FileRouteTypes {
     | '/dashboard/profitability'
     | '/dashboard/reps'
     | '/developer/audit'
+    | '/developer/branding'
     | '/developer/modules'
     | '/developer/tenants'
+    | '/notifications/send'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -532,8 +554,10 @@ export interface FileRouteTypes {
     | '/dashboard/profitability'
     | '/dashboard/reps'
     | '/developer/audit'
+    | '/developer/branding'
     | '/developer/modules'
     | '/developer/tenants'
+    | '/notifications/send'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -581,8 +605,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profitability'
     | '/_authenticated/dashboard/reps'
     | '/_authenticated/developer/audit'
+    | '/_authenticated/developer/branding'
     | '/_authenticated/developer/modules'
     | '/_authenticated/developer/tenants'
+    | '/_authenticated/notifications/send'
     | '/_authenticated/rep/attendance'
     | '/_authenticated/rep/customers'
     | '/_authenticated/rep/plan'
@@ -879,6 +905,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepAttendanceRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/notifications/send': {
+      id: '/_authenticated/notifications/send'
+      path: '/notifications/send'
+      fullPath: '/notifications/send'
+      preLoaderRoute: typeof AuthenticatedNotificationsSendRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/developer/tenants': {
       id: '/_authenticated/developer/tenants'
       path: '/tenants'
@@ -891,6 +924,13 @@ declare module '@tanstack/react-router' {
       path: '/modules'
       fullPath: '/developer/modules'
       preLoaderRoute: typeof AuthenticatedDeveloperModulesRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
+    '/_authenticated/developer/branding': {
+      id: '/_authenticated/developer/branding'
+      path: '/branding'
+      fullPath: '/developer/branding'
+      preLoaderRoute: typeof AuthenticatedDeveloperBrandingRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
     '/_authenticated/developer/audit': {
@@ -965,6 +1005,7 @@ const AuthenticatedRepRouteRouteWithChildren =
 
 interface AuthenticatedDeveloperRouteChildren {
   AuthenticatedDeveloperAuditRoute: typeof AuthenticatedDeveloperAuditRoute
+  AuthenticatedDeveloperBrandingRoute: typeof AuthenticatedDeveloperBrandingRoute
   AuthenticatedDeveloperModulesRoute: typeof AuthenticatedDeveloperModulesRoute
   AuthenticatedDeveloperTenantsRoute: typeof AuthenticatedDeveloperTenantsRoute
   AuthenticatedDeveloperIndexRoute: typeof AuthenticatedDeveloperIndexRoute
@@ -973,6 +1014,7 @@ interface AuthenticatedDeveloperRouteChildren {
 const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
   {
     AuthenticatedDeveloperAuditRoute: AuthenticatedDeveloperAuditRoute,
+    AuthenticatedDeveloperBrandingRoute: AuthenticatedDeveloperBrandingRoute,
     AuthenticatedDeveloperModulesRoute: AuthenticatedDeveloperModulesRoute,
     AuthenticatedDeveloperTenantsRoute: AuthenticatedDeveloperTenantsRoute,
     AuthenticatedDeveloperIndexRoute: AuthenticatedDeveloperIndexRoute,
@@ -1032,6 +1074,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardForecastRoute: typeof AuthenticatedDashboardForecastRoute
   AuthenticatedDashboardProfitabilityRoute: typeof AuthenticatedDashboardProfitabilityRoute
   AuthenticatedDashboardRepsRoute: typeof AuthenticatedDashboardRepsRoute
+  AuthenticatedNotificationsSendRoute: typeof AuthenticatedNotificationsSendRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -1062,6 +1105,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardProfitabilityRoute:
     AuthenticatedDashboardProfitabilityRoute,
   AuthenticatedDashboardRepsRoute: AuthenticatedDashboardRepsRoute,
+  AuthenticatedNotificationsSendRoute: AuthenticatedNotificationsSendRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -1087,3 +1131,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
