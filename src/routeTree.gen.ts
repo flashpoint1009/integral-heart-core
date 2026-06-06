@@ -40,6 +40,7 @@ import { Route as AuthenticatedRepSaleRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRepPlanRouteImport } from './routes/_authenticated/rep/plan'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep/customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
+import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -203,6 +204,12 @@ const AuthenticatedRepAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedRepRouteRoute,
   } as any)
+const AuthenticatedDeveloperTenantsRoute =
+  AuthenticatedDeveloperTenantsRouteImport.update({
+    id: '/tenants',
+    path: '/tenants',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedRepVisitCustomerIdRoute =
   AuthenticatedRepVisitCustomerIdRouteImport.update({
     id: '/visit/$customerId',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/': typeof AuthenticatedIndexRoute
+  '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -296,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/_authenticated/rep/plan': typeof AuthenticatedRepPlanRoute
@@ -331,6 +341,7 @@ export interface FileRouteTypes {
     | '/suppliers'
     | '/users'
     | '/warehouses'
+    | '/developer/tenants'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -361,6 +372,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/warehouses'
     | '/'
+    | '/developer/tenants'
     | '/rep/attendance'
     | '/rep/customers'
     | '/rep/plan'
@@ -395,6 +407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/warehouses'
     | '/_authenticated/'
+    | '/_authenticated/developer/tenants'
     | '/_authenticated/rep/attendance'
     | '/_authenticated/rep/customers'
     | '/_authenticated/rep/plan'
@@ -632,6 +645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepAttendanceRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/developer/tenants': {
+      id: '/_authenticated/developer/tenants'
+      path: '/tenants'
+      fullPath: '/developer/tenants'
+      preLoaderRoute: typeof AuthenticatedDeveloperTenantsRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
     '/_authenticated/rep/visit/$customerId': {
       id: '/_authenticated/rep/visit/$customerId'
       path: '/visit/$customerId'
@@ -666,11 +686,13 @@ const AuthenticatedRepRouteRouteWithChildren =
   )
 
 interface AuthenticatedDeveloperRouteChildren {
+  AuthenticatedDeveloperTenantsRoute: typeof AuthenticatedDeveloperTenantsRoute
   AuthenticatedDeveloperIndexRoute: typeof AuthenticatedDeveloperIndexRoute
 }
 
 const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
   {
+    AuthenticatedDeveloperTenantsRoute: AuthenticatedDeveloperTenantsRoute,
     AuthenticatedDeveloperIndexRoute: AuthenticatedDeveloperIndexRoute,
   }
 
