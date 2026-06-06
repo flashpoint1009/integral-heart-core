@@ -34,11 +34,11 @@ function Page() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("sales_invoices")
-        .select("id, total, paid_amount, customer_id, customers(name)")
+        .select("id, total, paid, customer_id, customers(name)")
         .gte("invoice_date", range.fromISO)
         .lte("invoice_date", range.toISO);
       if (error) throw error;
-      return data as Array<{ id: string; total: number; paid_amount: number; customer_id: string | null; customers: { name: string } | null }>;
+      return (data ?? []) as unknown as Array<{ id: string; total: number; paid: number; customer_id: string | null; customers: { name: string } | null }>;
     },
   });
 
@@ -49,17 +49,17 @@ function Page() {
       if (ids.length === 0) return [];
       const { data, error } = await supabase
         .from("sales_invoice_items")
-        .select("product_id, quantity, line_total, products(name_ar, name_en)")
+        .select("product_id, quantity, total, products(name_ar, name_en)")
         .in("invoice_id", ids);
       if (error) throw error;
-      return data as Array<{ product_id: string; quantity: number; line_total: number; products: { name_ar: string | null; name_en: string | null } | null }>;
+      return (data ?? []) as unknown as Array<{ product_id: string; quantity: number; total: number; products: { name_ar: string | null; name_en: string | null } | null }>;
     },
     enabled: invoices.length > 0,
   });
 
   const summary = useMemo(() => {
     const total = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
-    const paid = invoices.reduce((s, i) => s + Number(i.paid_amount || 0), 0);
+    const paid = invoices.reduce((s, i) => s + Number(i.paid || 0), 0);
     return { count: invoices.length, total, paid, due: total - paid };
   }, [invoices]);
 
@@ -69,7 +69,7 @@ function Page() {
       const name = it.products?.name_ar || it.products?.name_en || it.product_id;
       const cur = map.get(it.product_id) ?? { name, qty: 0, total: 0 };
       cur.qty += Number(it.quantity || 0);
-      cur.total += Number(it.line_total || 0);
+      cur.total += Number(it.total || 0);
       map.set(it.product_id, cur);
     }
     return [...map.values()].sort((a, b) => b.total - a.total).slice(0, 10);
