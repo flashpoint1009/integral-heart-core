@@ -48,7 +48,9 @@ function LayoutShell() {
           <Outlet />
         </main>
       </div>
-      <AppSidebar />
+      <div className="contents [&_[data-sidebar=sidebar]]:shadow-2xl">
+        <AppSidebar />
+      </div>
     </div>
   );
 }
