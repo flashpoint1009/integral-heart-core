@@ -264,6 +264,57 @@ function AttendanceTab() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const importXlsx = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<any>(ws, { defval: "" });
+      if (rows.length === 0) throw new Error("empty file");
+      // Build lookup: by employee_code OR by name
+      const byCode = new Map<string, string>();
+      const byName = new Map<string, string>();
+      for (const e of employees as any[]) {
+        if (e.employee_code) byCode.set(String(e.employee_code).trim(), e.id);
+        if (e.full_name) byName.set(String(e.full_name).trim().toLowerCase(), e.id);
+      }
+      const records: any[] = [];
+      const unmatched: string[] = [];
+      for (const r of rows) {
+        const code = String(r.code ?? r.employee_code ?? r.Code ?? r.ID ?? r.id ?? "").trim();
+        const name = String(r.name ?? r.full_name ?? r.Name ?? "").trim().toLowerCase();
+        const dt = String(r.date ?? r.Date ?? "").trim();
+        const status = String(r.status ?? r.Status ?? "present").trim().toLowerCase();
+        const checkIn = String(r.check_in ?? r.checkin ?? r["Check In"] ?? "").trim();
+        const checkOut = String(r.check_out ?? r.checkout ?? r["Check Out"] ?? "").trim();
+        const empId = (code && byCode.get(code)) || (name && byName.get(name));
+        if (!empId) { unmatched.push(code || name); continue; }
+        // Parse date: support yyyy-mm-dd or Excel serial
+        let dateStr = dt;
+        if (!dateStr) dateStr = date;
+        if (/^\d+$/.test(dateStr)) {
+          const d = XLSX.SSF.parse_date_code(Number(dateStr));
+          if (d) dateStr = `${d.y}-${String(d.m).padStart(2, "0")}-${String(d.d).padStart(2, "0")}`;
+        }
+        const hours = checkIn && checkOut ? Math.max(0, (new Date(`${dateStr}T${checkOut}`).getTime() - new Date(`${dateStr}T${checkIn}`).getTime()) / 3600000) : (status === "present" ? 8 : 0);
+        records.push({
+          employee_id: empId, date: dateStr,
+          status: ["present", "absent", "leave", "late"].includes(status) ? status : "present",
+          check_in: checkIn ? new Date(`${dateStr}T${checkIn}`).toISOString() : null,
+          check_out: checkOut ? new Date(`${dateStr}T${checkOut}`).toISOString() : null,
+          hours: +hours.toFixed(2),
+          notes: "imported",
+        });
+      }
+      if (records.length === 0) throw new Error("no matches");
+      const { error } = await supabase.from("attendance").upsert(records, { onConflict: "employee_id,date" });
+      if (error) throw error;
+      return { ok: records.length, skipped: unmatched.length };
+    },
+    onSuccess: ({ ok, skipped }) => { toast.success(t("hr.importDone", { ok, skipped })); qc.invalidateQueries({ queryKey: ["attendance", date] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const present = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "present").length;
   const absent = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "absent").length;
   const onLeave = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "leave").length;
@@ -280,6 +331,10 @@ function AttendanceTab() {
       <div className="flex items-end gap-3 flex-wrap">
         <div className="grid gap-1.5"><Label>{t("hr.date")}</Label><Input type="date" className="rounded-full" value={date} onChange={(e) => setDate(e.target.value)} /></div>
         <Button variant="outline" onClick={() => autoAbsent.mutate()} disabled={autoAbsent.isPending} className="gap-2"><Zap className="h-4 w-4" />{t("hr.runAutoAbsent")}</Button>
+        <label className="inline-flex">
+          <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importXlsx.mutate(f); e.target.value = ""; }} />
+          <Button asChild variant="outline" className="gap-2 cursor-pointer"><span><Upload className="h-4 w-4" />{t("hr.importAttendance")}</span></Button>
+        </label>
       </div>
       <div className="rounded-md border bg-card">
         <Table>
