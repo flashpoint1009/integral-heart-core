@@ -239,5 +239,40 @@
     "qty": "الكمية",
     "total": "الإجمالي",
     "noData": "لا توجد بيانات في الفترة دي"
+  },
+  "movements": {
+    "title": "حركات المخزون",
+    "description": "سجل كامل بكل حركة دخول أو خروج للمخزون",
+    "date": "التاريخ",
+    "product": "المنتج",
+    "warehouse": "المخزن",
+    "type": "النوع",
+    "qty": "الكمية",
+    "reference": "مرجع",
+    "notes": "ملاحظات",
+    "types": {
+      "purchase": "شراء",
+      "sale": "بيع",
+      "adjustment": "تسوية",
+      "transfer_in": "تحويل وارد",
+      "transfer_out": "تحويل صادر",
+      "return_in": "مرتجع وارد",
+      "return_out": "مرتجع صادر"
+    }
+  },
+  "payments": {
+    "title": "الدفعات",
+    "add": "تسجيل دفعة",
+    "method": "طريقة الدفع",
+    "amount": "المبلغ",
+    "date": "التاريخ",
+    "notes": "ملاحظات",
+    "remaining": "المتبقي",
+    "noPayments": "لا توجد دفعات بعد"
+  },
+  "invoice": {
+    "details": "تفاصيل الفاتورة",
+    "print": "طباعة",
+    "items": "الأصناف"
   }
 }
