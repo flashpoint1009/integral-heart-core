@@ -126,6 +126,11 @@ function Page() {
     queryFn: async () => (await supabase.from("warehouses").select("id,name,is_default").eq("is_active", true).order("name")).data ?? [],
   });
 
+  const { data: company } = useQuery({
+    queryKey: ["company_settings"],
+    queryFn: async () => (await supabase.from("company_settings").select("*").limit(1).maybeSingle()).data,
+  });
+
   const { data: products = [] } = useQuery({
     queryKey: ["products", "active"],
     queryFn: async () => (await supabase.from("products").select("id,name_ar,name_en,sale_price,tax_rate").eq("is_active", true).order("name_ar")).data as Product[] ?? [],
@@ -399,6 +404,24 @@ function Page() {
           </DialogHeader>
           {detail ? (
             <div id="invoice-print" className="space-y-4 text-sm">
+              <div className="hidden print:flex items-center justify-between border-b pb-3 mb-2">
+                <div className="flex items-center gap-3">
+                  {company?.logo_url && <img src={company.logo_url} alt="" className="h-14 w-14 object-contain" />}
+                  <div>
+                    <div className="text-lg font-bold">{company?.company_name ?? ""}</div>
+                    {company?.address && <div className="text-xs">{company.address}</div>}
+                    <div className="text-xs">
+                      {company?.phone && <span>{company.phone}</span>}
+                      {company?.email && <span> · {company.email}</span>}
+                    </div>
+                    {company?.tax_number && <div className="text-xs">Tax #: {company.tax_number}</div>}
+                  </div>
+                </div>
+                <div className="text-end">
+                  <div className="text-base font-semibold">{t("invoice.details")}</div>
+                  <div className="font-mono text-sm">{detail.invoice.invoice_number}</div>
+                </div>
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-muted-foreground text-xs">{t("sales.customer")}</div>
