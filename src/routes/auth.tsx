@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate, Navigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getAuthBranding } from "@/lib/api/notifications.functions";
 import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
@@ -26,6 +29,10 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const brandFn = useServerFn(getAuthBranding);
+  const { data: brandData } = useQuery({ queryKey: ["auth_branding"], queryFn: () => brandFn() });
+  const brand = brandData?.branding as any;
 
   if (!loading && user) return <Navigate to="/" replace />;
 
