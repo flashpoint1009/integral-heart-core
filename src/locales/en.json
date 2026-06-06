@@ -254,10 +254,8 @@
       "purchase": "Purchase",
       "sale": "Sale",
       "adjustment": "Adjustment",
-      "transfer_in": "Transfer In",
-      "transfer_out": "Transfer Out",
-      "return_in": "Return In",
-      "return_out": "Return Out"
+      "transfer": "Transfer",
+      "return": "Return"
     }
   },
   "payments": {
