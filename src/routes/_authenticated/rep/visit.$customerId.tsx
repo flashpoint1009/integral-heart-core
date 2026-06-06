@@ -48,9 +48,9 @@ function VisitPage() {
   const { data: accounts = [] } = useQuery({
     queryKey: ["rep_visit_accounts"],
     queryFn: async () => {
-      const { data } = await supabase.from("accounts").select("id, name, is_default").eq("is_active", true);
+      const { data } = await supabase.from("accounts").select("id, name, type").eq("is_active", true).order("name");
       const list = data ?? [];
-      const def = list.find((a) => a.is_default) ?? list[0];
+      const def = list.find((a) => a.type === "cash") ?? list[0];
       if (def && !accountId) setAccountId(def.id);
       return list;
     },
