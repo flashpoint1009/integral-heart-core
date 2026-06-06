@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth-context";
 import { useTranslation } from "react-i18next";
 import { LanguageToggle } from "./language-toggle";
 import { NotificationsBell } from "./notifications-bell";
+import { InstallPwaButton } from "./install-pwa-button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +43,7 @@ export function Topbar() {
       </div>
       <div className="flex-1 md:hidden" />
       <LanguageToggle />
+      <InstallPwaButton compact />
       <NotificationsBell />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
