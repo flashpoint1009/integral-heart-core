@@ -28,6 +28,7 @@ import { Route as AuthenticatedHrRouteImport } from './routes/_authenticated/hr'
 import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticated/finance'
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
+import { Route as AuthenticatedRepRouteRouteImport } from './routes/_authenticated/rep.route'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep.index'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep.customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep.attendance'
@@ -126,6 +127,11 @@ const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedRepRouteRoute = AuthenticatedRepRouteRouteImport.update({
+  id: '/rep',
+  path: '/rep',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -147,6 +153,7 @@ const AuthenticatedRepAttendanceRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/rep': typeof AuthenticatedRepRouteWithChildren
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/finance': typeof AuthenticatedFinanceRoute
@@ -156,7 +163,6 @@ export interface FileRoutesByFullPath {
   '/pos': typeof AuthenticatedPosRoute
   '/products': typeof AuthenticatedProductsRoute
   '/purchases': typeof AuthenticatedPurchasesRoute
-  '/rep': typeof AuthenticatedRepRouteWithChildren
   '/reports': typeof AuthenticatedReportsRoute
   '/sales': typeof AuthenticatedSalesRoute
   '/settings': typeof AuthenticatedSettingsRoute
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
+  '/rep': typeof AuthenticatedRepIndexRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
   '/finance': typeof AuthenticatedFinanceRoute
@@ -187,12 +194,12 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
-  '/rep': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/rep': typeof AuthenticatedRepRouteWithChildren
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
@@ -202,7 +209,6 @@ export interface FileRoutesById {
   '/_authenticated/pos': typeof AuthenticatedPosRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/purchases': typeof AuthenticatedPurchasesRoute
-  '/_authenticated/rep': typeof AuthenticatedRepRouteWithChildren
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
@@ -219,6 +225,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/rep'
     | '/categories'
     | '/customers'
     | '/finance'
@@ -228,7 +235,6 @@ export interface FileRouteTypes {
     | '/pos'
     | '/products'
     | '/purchases'
-    | '/rep'
     | '/reports'
     | '/sales'
     | '/settings'
@@ -241,6 +247,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
+    | '/rep'
     | '/categories'
     | '/customers'
     | '/finance'
@@ -259,11 +266,11 @@ export interface FileRouteTypes {
     | '/'
     | '/rep/attendance'
     | '/rep/customers'
-    | '/rep'
   id:
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/rep'
     | '/_authenticated/categories'
     | '/_authenticated/customers'
     | '/_authenticated/finance'
@@ -273,7 +280,6 @@ export interface FileRouteTypes {
     | '/_authenticated/pos'
     | '/_authenticated/products'
     | '/_authenticated/purchases'
-    | '/_authenticated/rep'
     | '/_authenticated/reports'
     | '/_authenticated/sales'
     | '/_authenticated/settings'
@@ -426,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/rep': {
+      id: '/_authenticated/rep'
+      path: '/rep'
+      fullPath: '/rep'
+      preLoaderRoute: typeof AuthenticatedRepRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rep/': {
       id: '/_authenticated/rep/'
       path: '/'
@@ -466,6 +479,7 @@ const AuthenticatedRepRouteWithChildren =
   AuthenticatedRepRoute._addFileChildren(AuthenticatedRepRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedRepRouteRoute: typeof AuthenticatedRepRouteRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
@@ -486,6 +500,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedRepRouteRoute: AuthenticatedRepRouteRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
