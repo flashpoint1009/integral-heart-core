@@ -407,6 +407,12 @@
     "recalculate": "إعادة حساب",
     "totalDeductions": "إجمالي الخصومات",
     "approveAdvance": "اعتماد",
-    "rejectAdvance": "رفض"
+    "rejectAdvance": "رفض",
+    "importAttendance": "استيراد بصمة (Excel)",
+    "importDone": "تم استيراد {{ok}} سجل، تم تجاهل {{skipped}}",
+    "addBonus": "إضافة حافز / مكافأة",
+    "bonusType": "النوع",
+    "total": "الإجمالي",
+    "bonusTypes": { "incentive": "حافز", "bonus": "مكافأة", "overtime": "إضافي" }
   }
 }

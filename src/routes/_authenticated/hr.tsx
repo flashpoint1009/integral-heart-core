@@ -16,8 +16,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, CalendarCheck, PlaneTakeoff, Wallet, CheckCircle2, XCircle, Clock, AlertOctagon, HandCoins, Zap, Calculator, Trash2 } from "lucide-react";
+import { Plus, Users, CalendarCheck, PlaneTakeoff, Wallet, CheckCircle2, XCircle, Clock, AlertOctagon, HandCoins, Zap, Calculator, Trash2, Gift, Upload } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/_authenticated/hr")({
   head: () => ({ meta: [{ title: "HR — ERP" }] }),
@@ -58,6 +59,7 @@ function Page() {
           <TabsTrigger value="leaves" className="gap-2"><PlaneTakeoff className="h-4 w-4" />{t("hr.leaves")}</TabsTrigger>
           <TabsTrigger value="penalties" className="gap-2"><AlertOctagon className="h-4 w-4" />{t("hr.penalties")}</TabsTrigger>
           <TabsTrigger value="advances" className="gap-2"><HandCoins className="h-4 w-4" />{t("hr.advances")}</TabsTrigger>
+          <TabsTrigger value="bonuses" className="gap-2"><Gift className="h-4 w-4" />{t("hr.bonuses")}</TabsTrigger>
           <TabsTrigger value="payroll" className="gap-2"><Wallet className="h-4 w-4" />{t("hr.payroll")}</TabsTrigger>
         </TabsList>
         <TabsContent value="employees" className="mt-4"><EmployeesTab /></TabsContent>
@@ -65,6 +67,7 @@ function Page() {
         <TabsContent value="leaves" className="mt-4"><LeavesTab /></TabsContent>
         <TabsContent value="penalties" className="mt-4"><PenaltiesTab /></TabsContent>
         <TabsContent value="advances" className="mt-4"><AdvancesTab /></TabsContent>
+        <TabsContent value="bonuses" className="mt-4"><BonusesTab /></TabsContent>
         <TabsContent value="payroll" className="mt-4"><PayrollTab /></TabsContent>
       </Tabs>
     </div>
@@ -261,6 +264,57 @@ function AttendanceTab() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const importXlsx = useMutation({
+    mutationFn: async (file: File) => {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<any>(ws, { defval: "" });
+      if (rows.length === 0) throw new Error("empty file");
+      // Build lookup: by employee_code OR by name
+      const byCode = new Map<string, string>();
+      const byName = new Map<string, string>();
+      for (const e of employees as any[]) {
+        if (e.employee_code) byCode.set(String(e.employee_code).trim(), e.id);
+        if (e.full_name) byName.set(String(e.full_name).trim().toLowerCase(), e.id);
+      }
+      const records: any[] = [];
+      const unmatched: string[] = [];
+      for (const r of rows) {
+        const code = String(r.code ?? r.employee_code ?? r.Code ?? r.ID ?? r.id ?? "").trim();
+        const name = String(r.name ?? r.full_name ?? r.Name ?? "").trim().toLowerCase();
+        const dt = String(r.date ?? r.Date ?? "").trim();
+        const status = String(r.status ?? r.Status ?? "present").trim().toLowerCase();
+        const checkIn = String(r.check_in ?? r.checkin ?? r["Check In"] ?? "").trim();
+        const checkOut = String(r.check_out ?? r.checkout ?? r["Check Out"] ?? "").trim();
+        const empId = (code && byCode.get(code)) || (name && byName.get(name));
+        if (!empId) { unmatched.push(code || name); continue; }
+        // Parse date: support yyyy-mm-dd or Excel serial
+        let dateStr = dt;
+        if (!dateStr) dateStr = date;
+        if (/^\d+$/.test(dateStr)) {
+          const d = XLSX.SSF.parse_date_code(Number(dateStr));
+          if (d) dateStr = `${d.y}-${String(d.m).padStart(2, "0")}-${String(d.d).padStart(2, "0")}`;
+        }
+        const hours = checkIn && checkOut ? Math.max(0, (new Date(`${dateStr}T${checkOut}`).getTime() - new Date(`${dateStr}T${checkIn}`).getTime()) / 3600000) : (status === "present" ? 8 : 0);
+        records.push({
+          employee_id: empId, date: dateStr,
+          status: ["present", "absent", "leave", "late"].includes(status) ? status : "present",
+          check_in: checkIn ? new Date(`${dateStr}T${checkIn}`).toISOString() : null,
+          check_out: checkOut ? new Date(`${dateStr}T${checkOut}`).toISOString() : null,
+          hours: +hours.toFixed(2),
+          notes: "imported",
+        });
+      }
+      if (records.length === 0) throw new Error("no matches");
+      const { error } = await supabase.from("attendance").upsert(records, { onConflict: "employee_id,date" });
+      if (error) throw error;
+      return { ok: records.length, skipped: unmatched.length };
+    },
+    onSuccess: ({ ok, skipped }) => { toast.success(t("hr.importDone", { ok, skipped })); qc.invalidateQueries({ queryKey: ["attendance", date] }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const present = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "present").length;
   const absent = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "absent").length;
   const onLeave = (employees as any[]).filter((e) => recMap.get(e.id)?.status === "leave").length;
@@ -277,6 +331,10 @@ function AttendanceTab() {
       <div className="flex items-end gap-3 flex-wrap">
         <div className="grid gap-1.5"><Label>{t("hr.date")}</Label><Input type="date" className="rounded-full" value={date} onChange={(e) => setDate(e.target.value)} /></div>
         <Button variant="outline" onClick={() => autoAbsent.mutate()} disabled={autoAbsent.isPending} className="gap-2"><Zap className="h-4 w-4" />{t("hr.runAutoAbsent")}</Button>
+        <label className="inline-flex">
+          <input type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importXlsx.mutate(f); e.target.value = ""; }} />
+          <Button asChild variant="outline" className="gap-2 cursor-pointer"><span><Upload className="h-4 w-4" />{t("hr.importAttendance")}</span></Button>
+        </label>
       </div>
       <div className="rounded-md border bg-card">
         <Table>
@@ -693,14 +751,16 @@ function PayrollTab() {
       const { start, end, days: daysInMonth } = monthRange(period);
 
       // Fetch period-scoped data once for all employees
-      const [attRes, penRes, advRes] = await Promise.all([
+      const [attRes, penRes, advRes, bonRes] = await Promise.all([
         supabase.from("attendance").select("employee_id,status").gte("date", start).lte("date", end).eq("status", "absent"),
         supabase.from("penalties").select("employee_id,amount").gte("date", start).lte("date", end),
         supabase.from("salary_advances").select("id,employee_id,monthly_deduction,remaining").eq("status", "approved").gt("remaining", 0),
+        supabase.from("bonuses").select("employee_id,amount,bonus_type").eq("period_month", periodDate),
       ]);
       if (attRes.error) throw attRes.error;
       if (penRes.error) throw penRes.error;
       if (advRes.error) throw advRes.error;
+      if (bonRes.error) throw bonRes.error;
 
       const absMap = new Map<string, number>();
       for (const r of attRes.data ?? []) absMap.set(r.employee_id, (absMap.get(r.employee_id) ?? 0) + 1);
@@ -711,6 +771,13 @@ function PayrollTab() {
         const arr = advByEmp.get(r.employee_id) ?? [];
         arr.push(r);
         advByEmp.set(r.employee_id, arr);
+      }
+      const bonusMap = new Map<string, { bonuses: number; incentives: number }>();
+      for (const r of bonRes.data ?? []) {
+        const cur = bonusMap.get(r.employee_id) ?? { bonuses: 0, incentives: 0 };
+        if (r.bonus_type === "bonus") cur.bonuses += Number(r.amount || 0);
+        else cur.incentives += Number(r.amount || 0);
+        bonusMap.set(r.employee_id, cur);
       }
 
       const { data: run, error: runErr } = await supabase.from("payroll_runs").insert({
@@ -738,12 +805,15 @@ function PayrollTab() {
           advanceUpdates.push({ id: adv.id, remaining: newRem, status: newRem <= 0 ? "paid_off" : "approved" });
         }
         advDed = +advDed.toFixed(2);
+        const bz = bonusMap.get(e.id) ?? { bonuses: 0, incentives: 0 };
+        const bonuses = +bz.bonuses.toFixed(2);
+        const incentives = +bz.incentives.toFixed(2);
         const deductions = +(insurance + penTotal + absDed + advDed).toFixed(2);
-        const net = +(base + allow + transport - deductions).toFixed(2);
+        const net = +(base + allow + transport + bonuses + incentives - deductions).toFixed(2);
         lines.push({
           run_id: run.id, employee_id: e.id,
           base_salary: base, allowances: allow, transport_allowance: transport,
-          bonuses: 0, incentives: 0,
+          bonuses, incentives,
           insurance, penalties_total: penTotal,
           absence_days: absDays, absence_deduction: absDed,
           advance_deduction: advDed,
@@ -799,6 +869,8 @@ function PayrollTab() {
             <TableHead className="text-end">{t("hr.baseSalary")}</TableHead>
             <TableHead className="text-end">{t("hr.allowances")}</TableHead>
             <TableHead className="text-end">{t("hr.transportAllowance")}</TableHead>
+            <TableHead className="text-end">{t("hr.bonuses")}</TableHead>
+            <TableHead className="text-end">{t("hr.incentives")}</TableHead>
             <TableHead className="text-end">{t("hr.insurance")}</TableHead>
             <TableHead className="text-end">{t("hr.absenceDays")}</TableHead>
             <TableHead className="text-end">{t("hr.absenceDeduction")}</TableHead>
@@ -808,13 +880,15 @@ function PayrollTab() {
           </TableRow></TableHeader>
           <TableBody>
             {(items as any[]).length === 0 ? (
-              <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">{currentRun ? t("common.empty") : t("hr.noPayrollYet")}</TableCell></TableRow>
+              <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">{currentRun ? t("common.empty") : t("hr.noPayrollYet")}</TableCell></TableRow>
             ) : (items as any[]).map((it: any) => (
               <TableRow key={it.id} className="hover:bg-muted/40">
                 <TableCell className="font-semibold text-primary">{it.employees?.full_name}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.base_salary))}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.allowances))}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.transport_allowance))}</TableCell>
+                <TableCell className="text-end tabular-nums text-emerald-700">{fmt(Number(it.bonuses))}</TableCell>
+                <TableCell className="text-end tabular-nums text-emerald-700">{fmt(Number(it.incentives))}</TableCell>
                 <TableCell className="text-end tabular-nums text-rose-600">{fmt(Number(it.insurance))}</TableCell>
                 <TableCell className="text-end tabular-nums">{it.absence_days ?? 0}</TableCell>
                 <TableCell className="text-end tabular-nums text-rose-600">{fmt(Number(it.absence_deduction))}</TableCell>
@@ -826,6 +900,123 @@ function PayrollTab() {
           </TableBody>
         </Table>
       </div>
+    </div>
+  );
+}
+
+/* -------- Bonuses / Incentives -------- */
+function BonusesTab() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [period, setPeriod] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().slice(0, 7); });
+  const [form, setForm] = useState({ employee_id: "", bonus_type: "incentive", amount: "0", reason: "" });
+
+  const periodDate = period + "-01";
+  const { data: employees = [] } = useQuery({ queryKey: ["employees"], queryFn: async () => (await supabase.from("employees").select("id,full_name").eq("is_active", true).order("full_name")).data ?? [] });
+  const { data: rows = [] } = useQuery({
+    queryKey: ["bonuses", periodDate],
+    queryFn: async () => (await supabase.from("bonuses").select("*, employees(full_name)").eq("period_month", periodDate).order("created_at", { ascending: false })).data ?? [],
+  });
+
+  const totals = useMemo(() => {
+    let bonus = 0, incentive = 0;
+    for (const r of rows as any[]) {
+      if (r.bonus_type === "bonus") bonus += Number(r.amount || 0);
+      else incentive += Number(r.amount || 0);
+    }
+    return { bonus, incentive, total: bonus + incentive };
+  }, [rows]);
+
+  const save = useMutation({
+    mutationFn: async () => {
+      if (!form.employee_id || Number(form.amount) <= 0) throw new Error("invalid");
+      const { error } = await supabase.from("bonuses").insert({
+        employee_id: form.employee_id, period_month: periodDate,
+        bonus_type: form.bonus_type, amount: Number(form.amount), reason: form.reason || null,
+        created_by: user?.id ?? null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => { toast.success(t("common.saved")); qc.invalidateQueries({ queryKey: ["bonuses"] }); setOpen(false); setForm({ employee_id: "", bonus_type: "incentive", amount: "0", reason: "" }); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const del = useMutation({
+    mutationFn: async (id: string) => { const { error } = await supabase.from("bonuses").delete().eq("id", id); if (error) throw error; },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["bonuses"] }); toast.success(t("common.deleted")); },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard label={t("hr.bonuses")} value={fmt(totals.bonus)} icon={Gift} tint="from-amber-500/10 to-amber-500/0" color="text-amber-600" />
+        <StatCard label={t("hr.incentives")} value={fmt(totals.incentive)} icon={Zap} tint="from-emerald-500/10 to-emerald-500/0" color="text-emerald-600" />
+        <StatCard label={t("hr.total")} value={fmt(totals.total)} icon={Wallet} tint="from-primary/10 to-primary/0" color="text-primary" />
+      </div>
+      <div className="flex items-end justify-between gap-3 flex-wrap">
+        <div className="grid gap-1.5"><Label>{t("hr.period")}</Label><Input type="month" className="rounded-full" value={period} onChange={(e) => setPeriod(e.target.value)} /></div>
+        <Button onClick={() => setOpen(true)}><Plus className="h-4 w-4 me-2" />{t("hr.addBonus")}</Button>
+      </div>
+      <div className="rounded-md border bg-card overflow-x-auto">
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead>{t("hr.employee")}</TableHead>
+            <TableHead>{t("hr.bonusType")}</TableHead>
+            <TableHead className="text-end">{t("hr.amount")}</TableHead>
+            <TableHead>{t("hr.reason")}</TableHead>
+            <TableHead className="text-end">{t("common.actions")}</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>
+            {(rows as any[]).length === 0 ? (
+              <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
+            ) : (rows as any[]).map((r: any) => (
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">{r.employees?.full_name}</TableCell>
+                <TableCell><Badge variant="outline" className="rounded-full">{t(`hr.bonusTypes.${r.bonus_type}`)}</Badge></TableCell>
+                <TableCell className="text-end tabular-nums font-semibold text-emerald-700">{fmt(Number(r.amount))}</TableCell>
+                <TableCell className="text-muted-foreground text-sm">{r.reason || "—"}</TableCell>
+                <TableCell className="text-end">
+                  <Button size="sm" variant="ghost" className="text-rose-600" onClick={() => del.mutate(r.id)}><Trash2 className="h-4 w-4" /></Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t("hr.addBonus")}</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>{t("hr.employee")} *</Label>
+              <Select value={form.employee_id} onValueChange={(v) => setForm({ ...form, employee_id: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{(employees as any[]).map((e) => <SelectItem key={e.id} value={e.id}>{e.full_name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div><Label>{t("hr.bonusType")} *</Label>
+                <Select value={form.bonus_type} onValueChange={(v) => setForm({ ...form, bonus_type: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="incentive">{t("hr.bonusTypes.incentive")}</SelectItem>
+                    <SelectItem value="bonus">{t("hr.bonusTypes.bonus")}</SelectItem>
+                    <SelectItem value="overtime">{t("hr.bonusTypes.overtime")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div><Label>{t("hr.amount")} *</Label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} /></div>
+            </div>
+            <div><Label>{t("hr.reason")}</Label><Textarea rows={2} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} /></div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>{t("common.cancel")}</Button>
+            <Button onClick={() => save.mutate()} disabled={save.isPending || !form.employee_id || Number(form.amount) <= 0}>{t("common.save")}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
