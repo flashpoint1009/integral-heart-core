@@ -22,7 +22,8 @@
     "system": "System",
     "finance": "Finance & HR",
     "financeHub": "Finance",
-    "hr": "HR"
+    "hr": "HR",
+    "field": "Field"
   },
   "auth": {
     "signIn": "Sign In",
