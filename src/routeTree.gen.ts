@@ -42,6 +42,7 @@ import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authent
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
+import { Route as AuthenticatedDashboardForecastRouteImport } from './routes/_authenticated/dashboard.forecast'
 import { Route as AuthenticatedDashboardExecutiveRouteImport } from './routes/_authenticated/dashboard.executive'
 import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
@@ -218,6 +219,12 @@ const AuthenticatedDeveloperModulesRoute =
     path: '/modules',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
+const AuthenticatedDashboardForecastRoute =
+  AuthenticatedDashboardForecastRouteImport.update({
+    id: '/dashboard/forecast',
+    path: '/dashboard/forecast',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardExecutiveRoute =
   AuthenticatedDashboardExecutiveRouteImport.update({
     id: '/dashboard/executive',
@@ -253,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -286,6 +294,7 @@ export interface FileRoutesByTo {
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/': typeof AuthenticatedIndexRoute
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -324,6 +333,7 @@ export interface FileRoutesById {
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/_authenticated/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/warehouses'
     | '/dashboard/executive'
+    | '/dashboard/forecast'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/warehouses'
     | '/'
     | '/dashboard/executive'
+    | '/dashboard/forecast'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -432,6 +444,7 @@ export interface FileRouteTypes {
     | '/_authenticated/warehouses'
     | '/_authenticated/'
     | '/_authenticated/dashboard/executive'
+    | '/_authenticated/dashboard/forecast'
     | '/_authenticated/developer/modules'
     | '/_authenticated/developer/tenants'
     | '/_authenticated/rep/attendance'
@@ -685,6 +698,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeveloperModulesRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
+    '/_authenticated/dashboard/forecast': {
+      id: '/_authenticated/dashboard/forecast'
+      path: '/dashboard/forecast'
+      fullPath: '/dashboard/forecast'
+      preLoaderRoute: typeof AuthenticatedDashboardForecastRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/executive': {
       id: '/_authenticated/dashboard/executive'
       path: '/dashboard/executive'
@@ -784,6 +804,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedWarehousesRoute: typeof AuthenticatedWarehousesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedDashboardExecutiveRoute: typeof AuthenticatedDashboardExecutiveRoute
+  AuthenticatedDashboardForecastRoute: typeof AuthenticatedDashboardForecastRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -807,6 +828,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedWarehousesRoute: AuthenticatedWarehousesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedDashboardExecutiveRoute: AuthenticatedDashboardExecutiveRoute,
+  AuthenticatedDashboardForecastRoute: AuthenticatedDashboardForecastRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
