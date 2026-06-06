@@ -18,7 +18,17 @@ export const Route = createFileRoute("/_authenticated/users")({
   component: Page,
 });
 
-const ALL_ROLES = ["admin", "manager", "cashier", "accountant"] as const;
+const ALL_ROLES = [
+  "admin",
+  "manager",
+  "sales_manager",
+  "accountant",
+  "warehouse",
+  "cashier",
+  "sales_rep",
+  "supervisor",
+  "hr",
+] as const;
 type RoleName = (typeof ALL_ROLES)[number];
 
 type Profile = { id: string; full_name: string | null; email: string | null };
