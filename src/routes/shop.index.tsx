@@ -29,7 +29,8 @@ function ShopHome() {
   const fetchCfg = useServerFn(getSiteConfigPublic);
   const { data } = useQuery({ queryKey: ["site_config_public"], queryFn: () => fetchCfg() });
   const cfg = data?.config;
-  const sections: Section[] = (cfg?.sections?.length ? cfg.sections : DEFAULT_SECTIONS) as Section[];
+  const rawSections = Array.isArray(cfg?.sections) ? (cfg!.sections as unknown as Section[]) : [];
+  const sections: Section[] = rawSections.length ? rawSections : DEFAULT_SECTIONS;
   const shape = (cfg?.card_shape as "square" | "rounded" | "circle") ?? "rounded";
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
   const { add } = useCart();
