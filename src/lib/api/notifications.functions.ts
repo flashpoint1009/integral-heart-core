@@ -5,7 +5,8 @@ import { z } from "zod";
 // ============ Branding (auth screen) ============
 export const getAuthBranding = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.from("auth_branding").select("*").eq("id", 1).maybeSingle();
+  const sb = supabaseAdmin as any;
+  const { data } = await sb.from("auth_branding").select("*").eq("id", 1).maybeSingle();
   return { branding: data };
 });
 
@@ -27,11 +28,11 @@ export const updateAuthBranding = createServerFn({ method: "POST" })
     primary_gradient: z.string().max(120).optional(),
   }).parse(d))
   .handler(async ({ data, context }) => {
-    const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+    const { data: roles } = await (context.supabase as any).from("user_roles").select("role").eq("user_id", context.userId);
     const ok = (roles ?? []).some((r: any) => r.role === "developer" || r.role === "admin");
     if (!ok) throw new Error("Unauthorized");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("auth_branding").update({ ...data, updated_at: new Date().toISOString() }).eq("id", 1);
+    const { error } = await (supabaseAdmin as any).from("auth_branding").update({ ...data, updated_at: new Date().toISOString() }).eq("id", 1);
     if (error) throw error;
     return { ok: true };
   });
@@ -39,8 +40,8 @@ export const updateAuthBranding = createServerFn({ method: "POST" })
 // ============ Push subscriptions ============
 export const getVapidPublicKey = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data } = await supabaseAdmin.from("app_secrets").select("value").eq("key", "vapid_public_key").maybeSingle();
-  return { publicKey: data?.value ?? "" };
+  const { data } = await (supabaseAdmin as any).from("app_secrets").select("value").eq("key", "vapid_public_key").maybeSingle();
+  return { publicKey: (data as any)?.value ?? "" };
 });
 
 export const savePushSubscription = createServerFn({ method: "POST" })
@@ -54,7 +55,7 @@ export const savePushSubscription = createServerFn({ method: "POST" })
     }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
+    const { error } = await (supabaseAdmin as any)
       .from("push_subscriptions")
       .upsert({ user_id: context.userId, ...data }, { onConflict: "endpoint" });
     if (error) throw error;
@@ -66,23 +67,24 @@ export const deletePushSubscription = createServerFn({ method: "POST" })
   .inputValidator((d: { endpoint: string }) => z.object({ endpoint: z.string() }).parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("push_subscriptions").delete().eq("user_id", context.userId).eq("endpoint", data.endpoint);
+    await (supabaseAdmin as any).from("push_subscriptions").delete().eq("user_id", context.userId).eq("endpoint", data.endpoint);
     return { ok: true };
   });
 
 // ============ Send notification to user ============
 async function sendWebPush(userId: string, payload: { title: string; body?: string; link?: string }) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: subs } = await supabaseAdmin.from("push_subscriptions").select("*").eq("user_id", userId);
+  const sb = supabaseAdmin as any;
+  const { data: subs } = await sb.from("push_subscriptions").select("*").eq("user_id", userId);
   if (!subs?.length) return { sent: 0 };
 
-  const { data: vapPub } = await supabaseAdmin.from("app_secrets").select("value").eq("key", "vapid_public_key").maybeSingle();
-  const { data: vapPriv } = await supabaseAdmin.from("app_secrets").select("value").eq("key", "vapid_private_key").maybeSingle();
-  const { data: vapSub } = await supabaseAdmin.from("app_secrets").select("value").eq("key", "vapid_subject").maybeSingle();
-  if (!vapPub?.value || !vapPriv?.value) return { sent: 0 };
+  const { data: vapPub } = await sb.from("app_secrets").select("value").eq("key", "vapid_public_key").maybeSingle();
+  const { data: vapPriv } = await sb.from("app_secrets").select("value").eq("key", "vapid_private_key").maybeSingle();
+  const { data: vapSub } = await sb.from("app_secrets").select("value").eq("key", "vapid_subject").maybeSingle();
+  if (!(vapPub as any)?.value || !(vapPriv as any)?.value) return { sent: 0 };
 
   const webpush = (await import("web-push")).default;
-  webpush.setVapidDetails(vapSub?.value ?? "mailto:admin@example.com", vapPub.value, vapPriv.value);
+  webpush.setVapidDetails((vapSub as any)?.value ?? "mailto:admin@example.com", (vapPub as any).value, (vapPriv as any).value);
 
   let sent = 0;
   await Promise.all(
@@ -95,7 +97,7 @@ async function sendWebPush(userId: string, payload: { title: string; body?: stri
         sent++;
       } catch (e: any) {
         if (e?.statusCode === 410 || e?.statusCode === 404) {
-          await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
+          await sb.from("push_subscriptions").delete().eq("endpoint", s.endpoint);
         }
       }
     }),
@@ -129,7 +131,7 @@ export const sendNotification = createServerFn({ method: "POST" })
     if (data.user_id) userIds = [data.user_id];
     if (data.user_ids?.length) userIds = [...userIds, ...data.user_ids];
     if (data.role) {
-      const { data: rs } = await supabaseAdmin.from("user_roles").select("user_id").eq("role", data.role);
+      const { data: rs } = await (supabaseAdmin as any).from("user_roles").select("user_id").eq("role", data.role);
       userIds = [...userIds, ...(rs ?? []).map((r: any) => r.user_id)];
     }
     userIds = Array.from(new Set(userIds));
@@ -143,7 +145,7 @@ export const sendNotification = createServerFn({ method: "POST" })
       body: data.body,
       link: data.link,
     }));
-    await supabaseAdmin.from("notifications").insert(rows);
+    await (supabaseAdmin as any).from("notifications").insert(rows);
 
     let pushed = 0;
     for (const uid of userIds) {
@@ -157,11 +159,11 @@ export const sendNotification = createServerFn({ method: "POST" })
 export const listRecipients = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data: roles } = await context.supabase.from("user_roles").select("role").eq("user_id", context.userId);
+    const { data: roles } = await (context.supabase as any).from("user_roles").select("role").eq("user_id", context.userId);
     const allowed = (roles ?? []).some((r: any) => ["admin", "manager", "supervisor", "hr"].includes(r.role));
     if (!allowed) throw new Error("Unauthorized");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data } = await supabaseAdmin.from("profiles").select("id, full_name, email").order("full_name");
+    const { data } = await (supabaseAdmin as any).from("profiles").select("id, full_name, email").order("full_name");
     return { users: data ?? [] };
   });
 
@@ -169,7 +171,7 @@ export const listRecipients = createServerFn({ method: "GET" })
 export const listMyNotifications = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await context.supabase
+    const { data } = await (context.supabase as any)
       .from("notifications")
       .select("*")
       .eq("user_id", context.userId)
@@ -183,9 +185,9 @@ export const markNotificationRead = createServerFn({ method: "POST" })
   .inputValidator((d: { id?: string; all?: boolean }) => z.object({ id: z.string().uuid().optional(), all: z.boolean().optional() }).parse(d))
   .handler(async ({ data, context }) => {
     if (data.all) {
-      await context.supabase.from("notifications").update({ is_read: true }).eq("user_id", context.userId).eq("is_read", false);
+      await (context.supabase as any).from("notifications").update({ is_read: true }).eq("user_id", context.userId).eq("is_read", false);
     } else if (data.id) {
-      await context.supabase.from("notifications").update({ is_read: true }).eq("id", data.id).eq("user_id", context.userId);
+      await (context.supabase as any).from("notifications").update({ is_read: true }).eq("id", data.id).eq("user_id", context.userId);
     }
     return { ok: true };
   });
