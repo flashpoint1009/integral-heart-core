@@ -19,6 +19,9 @@ import {
   Wallet,
   UsersRound,
   MapPin,
+  Crown,
+  Layers,
+  Building2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,21 +39,36 @@ import {
 export function AppSidebar() {
   const { t } = useTranslation();
   const { state } = useSidebar();
-  const { hasAnyRole } = useAuth();
+  const { hasAnyRole, isDeveloper, moduleEnabled } = useAuth();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
 
-  const showSupervisor = hasAnyRole(["admin", "manager", "supervisor"]);
+  const showSupervisor =
+    hasAnyRole(["admin", "manager", "supervisor"]) && moduleEnabled("supervisor");
+  const showDeveloper = isDeveloper || hasAnyRole(["admin"]);
 
-  const groups = [
+  type Item = { url: string; icon: typeof LayoutDashboard; title: string; module?: string };
+  type Group = { label: string; items: Item[] };
+
+  const groupsRaw: Group[] = [
     {
       label: t("nav.main"),
       items: [
         { url: "/", icon: LayoutDashboard, title: t("nav.dashboard") },
-        { url: "/pos", icon: ShoppingCart, title: t("nav.pos") },
+        { url: "/pos", icon: ShoppingCart, title: t("nav.pos"), module: "pos" },
       ],
     },
+    ...(showDeveloper ? [{
+      label: "المطور",
+      items: [
+        { url: "/developer", icon: Crown, title: "لوحة المطور" } as Item,
+        ...(isDeveloper ? [
+          { url: "/developer/tenants", icon: Building2, title: "الشركات" } as Item,
+        ] : []),
+        { url: "/developer/modules", icon: Layers, title: "المكونات" } as Item,
+      ],
+    }] : []),
     ...(showSupervisor ? [{
       label: t("nav.field"),
       items: [
@@ -60,10 +78,10 @@ export function AppSidebar() {
     {
       label: t("nav.operations"),
       items: [
-        { url: "/sales", icon: Receipt, title: t("nav.sales") },
-        { url: "/purchases", icon: ShoppingBag, title: t("purchases.title") },
-        { url: "/inventory", icon: Boxes, title: t("nav.inventory") },
-        { url: "/movements", icon: History, title: t("movements.title") },
+        { url: "/sales", icon: Receipt, title: t("nav.sales"), module: "sales" },
+        { url: "/purchases", icon: ShoppingBag, title: t("purchases.title"), module: "purchases" },
+        { url: "/inventory", icon: Boxes, title: t("nav.inventory"), module: "inventory" },
+        { url: "/movements", icon: History, title: t("movements.title"), module: "inventory" },
       ],
     },
     {
@@ -71,7 +89,7 @@ export function AppSidebar() {
       items: [
         { url: "/products", icon: Package, title: t("nav.products") },
         { url: "/categories", icon: Tags, title: t("nav.categories") },
-        { url: "/warehouses", icon: Warehouse, title: t("nav.warehouses") },
+        { url: "/warehouses", icon: Warehouse, title: t("nav.warehouses"), module: "inventory" },
         { url: "/customers", icon: Users, title: t("nav.customers") },
         { url: "/suppliers", icon: Truck, title: t("nav.suppliers") },
       ],
@@ -79,19 +97,27 @@ export function AppSidebar() {
     {
       label: t("nav.finance"),
       items: [
-        { url: "/finance", icon: Wallet, title: t("nav.financeHub") },
-        { url: "/hr", icon: UsersRound, title: t("nav.hr") },
+        { url: "/finance", icon: Wallet, title: t("nav.financeHub"), module: "finance" },
+        { url: "/hr", icon: UsersRound, title: t("nav.hr"), module: "hr" },
       ],
     },
     {
       label: t("nav.system"),
       items: [
-        { url: "/reports", icon: BarChart3, title: t("nav.reports") },
+        { url: "/reports", icon: BarChart3, title: t("nav.reports"), module: "reports" },
         { url: "/users", icon: UserCog, title: t("nav.users") },
         { url: "/settings", icon: Settings, title: t("nav.settings") },
       ],
     },
   ];
+
+  // Filter by enabled modules
+  const groups = groupsRaw
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((it) => !it.module || moduleEnabled(it.module)),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <Sidebar side="right" collapsible="offcanvas">
