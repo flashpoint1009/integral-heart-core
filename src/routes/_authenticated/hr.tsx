@@ -751,14 +751,16 @@ function PayrollTab() {
       const { start, end, days: daysInMonth } = monthRange(period);
 
       // Fetch period-scoped data once for all employees
-      const [attRes, penRes, advRes] = await Promise.all([
+      const [attRes, penRes, advRes, bonRes] = await Promise.all([
         supabase.from("attendance").select("employee_id,status").gte("date", start).lte("date", end).eq("status", "absent"),
         supabase.from("penalties").select("employee_id,amount").gte("date", start).lte("date", end),
         supabase.from("salary_advances").select("id,employee_id,monthly_deduction,remaining").eq("status", "approved").gt("remaining", 0),
+        supabase.from("bonuses").select("employee_id,amount,bonus_type").eq("period_month", periodDate),
       ]);
       if (attRes.error) throw attRes.error;
       if (penRes.error) throw penRes.error;
       if (advRes.error) throw advRes.error;
+      if (bonRes.error) throw bonRes.error;
 
       const absMap = new Map<string, number>();
       for (const r of attRes.data ?? []) absMap.set(r.employee_id, (absMap.get(r.employee_id) ?? 0) + 1);
@@ -769,6 +771,13 @@ function PayrollTab() {
         const arr = advByEmp.get(r.employee_id) ?? [];
         arr.push(r);
         advByEmp.set(r.employee_id, arr);
+      }
+      const bonusMap = new Map<string, { bonuses: number; incentives: number }>();
+      for (const r of bonRes.data ?? []) {
+        const cur = bonusMap.get(r.employee_id) ?? { bonuses: 0, incentives: 0 };
+        if (r.bonus_type === "bonus") cur.bonuses += Number(r.amount || 0);
+        else cur.incentives += Number(r.amount || 0);
+        bonusMap.set(r.employee_id, cur);
       }
 
       const { data: run, error: runErr } = await supabase.from("payroll_runs").insert({
@@ -796,12 +805,15 @@ function PayrollTab() {
           advanceUpdates.push({ id: adv.id, remaining: newRem, status: newRem <= 0 ? "paid_off" : "approved" });
         }
         advDed = +advDed.toFixed(2);
+        const bz = bonusMap.get(e.id) ?? { bonuses: 0, incentives: 0 };
+        const bonuses = +bz.bonuses.toFixed(2);
+        const incentives = +bz.incentives.toFixed(2);
         const deductions = +(insurance + penTotal + absDed + advDed).toFixed(2);
-        const net = +(base + allow + transport - deductions).toFixed(2);
+        const net = +(base + allow + transport + bonuses + incentives - deductions).toFixed(2);
         lines.push({
           run_id: run.id, employee_id: e.id,
           base_salary: base, allowances: allow, transport_allowance: transport,
-          bonuses: 0, incentives: 0,
+          bonuses, incentives,
           insurance, penalties_total: penTotal,
           absence_days: absDays, absence_deduction: absDed,
           advance_deduction: advDed,
