@@ -42,6 +42,10 @@ import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authent
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
+import { Route as AuthenticatedDashboardRepsRouteImport } from './routes/_authenticated/dashboard.reps'
+import { Route as AuthenticatedDashboardProfitabilityRouteImport } from './routes/_authenticated/dashboard.profitability'
+import { Route as AuthenticatedDashboardForecastRouteImport } from './routes/_authenticated/dashboard.forecast'
+import { Route as AuthenticatedDashboardExecutiveRouteImport } from './routes/_authenticated/dashboard.executive'
 import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
 const AuthRoute = AuthRouteImport.update({
@@ -217,6 +221,30 @@ const AuthenticatedDeveloperModulesRoute =
     path: '/modules',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
+const AuthenticatedDashboardRepsRoute =
+  AuthenticatedDashboardRepsRouteImport.update({
+    id: '/dashboard/reps',
+    path: '/dashboard/reps',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardProfitabilityRoute =
+  AuthenticatedDashboardProfitabilityRouteImport.update({
+    id: '/dashboard/profitability',
+    path: '/dashboard/profitability',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardForecastRoute =
+  AuthenticatedDashboardForecastRouteImport.update({
+    id: '/dashboard/forecast',
+    path: '/dashboard/forecast',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDashboardExecutiveRoute =
+  AuthenticatedDashboardExecutiveRouteImport.update({
+    id: '/dashboard/executive',
+    path: '/dashboard/executive',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRepVisitCustomerIdRoute =
   AuthenticatedRepVisitCustomerIdRouteImport.update({
     id: '/visit/$customerId',
@@ -245,6 +273,10 @@ export interface FileRoutesByFullPath {
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
+  '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -277,6 +309,10 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/': typeof AuthenticatedIndexRoute
+  '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
+  '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -314,6 +350,10 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
+  '/_authenticated/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
+  '/_authenticated/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/_authenticated/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -351,6 +391,10 @@ export interface FileRouteTypes {
     | '/suppliers'
     | '/users'
     | '/warehouses'
+    | '/dashboard/executive'
+    | '/dashboard/forecast'
+    | '/dashboard/profitability'
+    | '/dashboard/reps'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -383,6 +427,10 @@ export interface FileRouteTypes {
     | '/users'
     | '/warehouses'
     | '/'
+    | '/dashboard/executive'
+    | '/dashboard/forecast'
+    | '/dashboard/profitability'
+    | '/dashboard/reps'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -419,6 +467,10 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/warehouses'
     | '/_authenticated/'
+    | '/_authenticated/dashboard/executive'
+    | '/_authenticated/dashboard/forecast'
+    | '/_authenticated/dashboard/profitability'
+    | '/_authenticated/dashboard/reps'
     | '/_authenticated/developer/modules'
     | '/_authenticated/developer/tenants'
     | '/_authenticated/rep/attendance'
@@ -672,6 +724,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeveloperModulesRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
+    '/_authenticated/dashboard/reps': {
+      id: '/_authenticated/dashboard/reps'
+      path: '/dashboard/reps'
+      fullPath: '/dashboard/reps'
+      preLoaderRoute: typeof AuthenticatedDashboardRepsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/profitability': {
+      id: '/_authenticated/dashboard/profitability'
+      path: '/dashboard/profitability'
+      fullPath: '/dashboard/profitability'
+      preLoaderRoute: typeof AuthenticatedDashboardProfitabilityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/forecast': {
+      id: '/_authenticated/dashboard/forecast'
+      path: '/dashboard/forecast'
+      fullPath: '/dashboard/forecast'
+      preLoaderRoute: typeof AuthenticatedDashboardForecastRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dashboard/executive': {
+      id: '/_authenticated/dashboard/executive'
+      path: '/dashboard/executive'
+      fullPath: '/dashboard/executive'
+      preLoaderRoute: typeof AuthenticatedDashboardExecutiveRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/rep/visit/$customerId': {
       id: '/_authenticated/rep/visit/$customerId'
       path: '/visit/$customerId'
@@ -763,6 +843,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedWarehousesRoute: typeof AuthenticatedWarehousesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedDashboardExecutiveRoute: typeof AuthenticatedDashboardExecutiveRoute
+  AuthenticatedDashboardForecastRoute: typeof AuthenticatedDashboardForecastRoute
+  AuthenticatedDashboardProfitabilityRoute: typeof AuthenticatedDashboardProfitabilityRoute
+  AuthenticatedDashboardRepsRoute: typeof AuthenticatedDashboardRepsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -785,6 +869,11 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedWarehousesRoute: AuthenticatedWarehousesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedDashboardExecutiveRoute: AuthenticatedDashboardExecutiveRoute,
+  AuthenticatedDashboardForecastRoute: AuthenticatedDashboardForecastRoute,
+  AuthenticatedDashboardProfitabilityRoute:
+    AuthenticatedDashboardProfitabilityRoute,
+  AuthenticatedDashboardRepsRoute: AuthenticatedDashboardRepsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
