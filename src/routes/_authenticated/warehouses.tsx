@@ -101,14 +101,14 @@ function Page() {
             ) : rows.length === 0 ? (
               <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
             ) : rows.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-medium">
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">
                   {r.name}
-                  {r.is_default && <Badge variant="secondary" className="ms-2">{t("warehouses.is_default")}</Badge>}
+                  {r.is_default && <Badge variant="secondary" className="ms-2 rounded-full">{t("warehouses.is_default")}</Badge>}
                 </TableCell>
                 <TableCell className="text-muted-foreground">{r.code ?? "—"}</TableCell>
                 <TableCell className="text-muted-foreground">{r.address ?? "—"}</TableCell>
-                <TableCell>{r.is_active ? <Badge>{t("common.active")}</Badge> : <Badge variant="outline">{t("common.inactive")}</Badge>}</TableCell>
+                <TableCell>{r.is_active ? <Badge className="rounded-full">{t("common.active")}</Badge> : <Badge variant="outline" className="rounded-full">{t("common.inactive")}</Badge>}</TableCell>
                 <TableCell className="text-end">
                   <div className="flex gap-1 justify-end">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
