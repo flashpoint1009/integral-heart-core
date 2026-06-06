@@ -166,3 +166,13 @@
   [data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"] [data-overlay] { display: none !important; }
   [role="dialog"] { position: static !important; transform: none !important; box-shadow: none !important; border: none !important; max-width: none !important; max-height: none !important; padding: 0 !important; }
 }
+
+/* Sidebar overlay: prevent the offcanvas sidebar from pushing content on desktop */
+.peer[data-state="expanded"][data-side="right"] > div:first-child,
+.peer[data-state="expanded"][data-side="left"] > div:first-child {
+  width: 0 !important;
+}
+.peer[data-state="expanded"] ~ * [data-sidebar="sidebar"],
+.peer[data-state="expanded"] > div:last-child {
+  box-shadow: -10px 0 30px -10px hsl(0 0% 0% / 0.25);
+}
