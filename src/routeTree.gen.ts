@@ -32,6 +32,7 @@ import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedRepRouteRouteImport } from './routes/_authenticated/rep/route'
 import { Route as AuthenticatedSupervisorIndexRouteImport } from './routes/_authenticated/supervisor.index'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep/index'
+import { Route as AuthenticatedDeveloperIndexRouteImport } from './routes/_authenticated/developer.index'
 import { Route as AuthenticatedSupervisorRoutesRouteImport } from './routes/_authenticated/supervisor.routes'
 import { Route as AuthenticatedSupervisorReportsRouteImport } from './routes/_authenticated/supervisor.reports'
 import { Route as AuthenticatedSupervisorLiveRouteImport } from './routes/_authenticated/supervisor.live'
@@ -156,6 +157,12 @@ const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRepRouteRoute,
 } as any)
+const AuthenticatedDeveloperIndexRoute =
+  AuthenticatedDeveloperIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedSupervisorRoutesRoute =
   AuthenticatedSupervisorRoutesRouteImport.update({
     id: '/routes',
@@ -209,7 +216,7 @@ export interface FileRoutesByFullPath {
   '/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
-  '/developer': typeof AuthenticatedDeveloperRoute
+  '/developer': typeof AuthenticatedDeveloperRouteWithChildren
   '/finance': typeof AuthenticatedFinanceRoute
   '/hr': typeof AuthenticatedHrRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/developer/': typeof AuthenticatedDeveloperIndexRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
   '/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -239,7 +247,6 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
-  '/developer': typeof AuthenticatedDeveloperRoute
   '/finance': typeof AuthenticatedFinanceRoute
   '/hr': typeof AuthenticatedHrRoute
   '/inventory': typeof AuthenticatedInventoryRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByTo {
   '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/developer': typeof AuthenticatedDeveloperIndexRoute
   '/rep': typeof AuthenticatedRepIndexRoute
   '/supervisor': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -272,7 +280,7 @@ export interface FileRoutesById {
   '/_authenticated/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
-  '/_authenticated/developer': typeof AuthenticatedDeveloperRoute
+  '/_authenticated/developer': typeof AuthenticatedDeveloperRouteWithChildren
   '/_authenticated/finance': typeof AuthenticatedFinanceRoute
   '/_authenticated/hr': typeof AuthenticatedHrRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/_authenticated/supervisor/reports': typeof AuthenticatedSupervisorReportsRoute
   '/_authenticated/supervisor/routes': typeof AuthenticatedSupervisorRoutesRoute
+  '/_authenticated/developer/': typeof AuthenticatedDeveloperIndexRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
   '/_authenticated/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/_authenticated/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/supervisor/live'
     | '/supervisor/reports'
     | '/supervisor/routes'
+    | '/developer/'
     | '/rep/'
     | '/supervisor/'
     | '/rep/visit/$customerId'
@@ -337,7 +347,6 @@ export interface FileRouteTypes {
     | '/auth'
     | '/categories'
     | '/customers'
-    | '/developer'
     | '/finance'
     | '/hr'
     | '/inventory'
@@ -359,6 +368,7 @@ export interface FileRouteTypes {
     | '/supervisor/live'
     | '/supervisor/reports'
     | '/supervisor/routes'
+    | '/developer'
     | '/rep'
     | '/supervisor'
     | '/rep/visit/$customerId'
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/_authenticated/supervisor/live'
     | '/_authenticated/supervisor/reports'
     | '/_authenticated/supervisor/routes'
+    | '/_authenticated/developer/'
     | '/_authenticated/rep/'
     | '/_authenticated/supervisor/'
     | '/_authenticated/rep/visit/$customerId'
@@ -565,6 +576,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepIndexRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/developer/': {
+      id: '/_authenticated/developer/'
+      path: '/'
+      fullPath: '/developer/'
+      preLoaderRoute: typeof AuthenticatedDeveloperIndexRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
     '/_authenticated/supervisor/routes': {
       id: '/_authenticated/supervisor/routes'
       path: '/routes'
@@ -647,6 +665,20 @@ const AuthenticatedRepRouteRouteWithChildren =
     AuthenticatedRepRouteRouteChildren,
   )
 
+interface AuthenticatedDeveloperRouteChildren {
+  AuthenticatedDeveloperIndexRoute: typeof AuthenticatedDeveloperIndexRoute
+}
+
+const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
+  {
+    AuthenticatedDeveloperIndexRoute: AuthenticatedDeveloperIndexRoute,
+  }
+
+const AuthenticatedDeveloperRouteWithChildren =
+  AuthenticatedDeveloperRoute._addFileChildren(
+    AuthenticatedDeveloperRouteChildren,
+  )
+
 interface AuthenticatedSupervisorRouteChildren {
   AuthenticatedSupervisorLiveRoute: typeof AuthenticatedSupervisorLiveRoute
   AuthenticatedSupervisorReportsRoute: typeof AuthenticatedSupervisorReportsRoute
@@ -671,7 +703,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedRepRouteRoute: typeof AuthenticatedRepRouteRouteWithChildren
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedCustomersRoute: typeof AuthenticatedCustomersRoute
-  AuthenticatedDeveloperRoute: typeof AuthenticatedDeveloperRoute
+  AuthenticatedDeveloperRoute: typeof AuthenticatedDeveloperRouteWithChildren
   AuthenticatedFinanceRoute: typeof AuthenticatedFinanceRoute
   AuthenticatedHrRoute: typeof AuthenticatedHrRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
@@ -693,7 +725,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedRepRouteRoute: AuthenticatedRepRouteRouteWithChildren,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedCustomersRoute: AuthenticatedCustomersRoute,
-  AuthenticatedDeveloperRoute: AuthenticatedDeveloperRoute,
+  AuthenticatedDeveloperRoute: AuthenticatedDeveloperRouteWithChildren,
   AuthenticatedFinanceRoute: AuthenticatedFinanceRoute,
   AuthenticatedHrRoute: AuthenticatedHrRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
