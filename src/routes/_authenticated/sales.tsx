@@ -20,7 +20,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Eye, Printer, Wallet } from "lucide-react";
+import { Plus, Trash2, Printer, Wallet, Search, Receipt, TrendingUp, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/sales")({
@@ -194,13 +195,72 @@ function Page() {
     paid: "default", partial: "secondary", confirmed: "outline", draft: "outline", cancelled: "destructive",
   };
 
+  const [search, setSearch] = useState("");
+  const filteredInvoices = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return invoices;
+    return invoices.filter((inv) =>
+      inv.invoice_number.toLowerCase().includes(q) ||
+      customerName(inv.customer_id).toLowerCase().includes(q),
+    );
+  }, [invoices, search, customers]);
+
+  const summary = useMemo(() => {
+    const totalSales = invoices.reduce((s, i) => s + Number(i.total || 0), 0);
+    const totalPaid = invoices.reduce((s, i) => s + Number(i.paid || 0), 0);
+    const totalDue = totalSales - totalPaid;
+    return { count: invoices.length, totalSales, totalPaid, totalDue };
+  }, [invoices]);
+
   return (
-    <div className="p-6">
-      <PageHeader title={t("sales.title")} actions={<Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("sales.new")}</Button>} />
-      <div className="rounded-md border bg-card overflow-x-auto">
+    <div className="p-6 space-y-6">
+      <PageHeader
+        title={t("sales.title")}
+        description={t("sales.subtitle", "كل فواتير المبيعات والمدفوعات في مكان واحد")}
+        actions={
+          <Button onClick={openNew} className="rounded-xl shadow-md h-10">
+            <Plus className="h-4 w-4 me-2" />{t("sales.new")}
+          </Button>
+        }
+      />
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: t("sales.invoicesCount", "عدد الفواتير"), value: summary.count.toString(), icon: Receipt, bg: "bg-primary/10 text-primary" },
+          { label: t("sales.totalSales", "إجمالي المبيعات"), value: fmt(summary.totalSales), icon: TrendingUp, bg: "bg-emerald-500/10 text-emerald-600" },
+          { label: t("sales.totalPaid", "إجمالي المحصّل"), value: fmt(summary.totalPaid), icon: Wallet, bg: "bg-violet-500/10 text-violet-600" },
+          { label: t("sales.totalDue", "إجمالي المستحق"), value: fmt(summary.totalDue), icon: Clock, bg: "bg-amber-500/10 text-amber-600" },
+        ].map((s) => (
+          <Card key={s.label} className="border-border/60 shadow-sm">
+            <CardContent className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{s.label}</p>
+                <p className="text-2xl font-bold tabular-nums">{s.value}</p>
+              </div>
+              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${s.bg}`}>
+                <s.icon className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="rounded-2xl border border-border/60 bg-card shadow-sm overflow-hidden">
+        <div className="p-4 border-b flex items-center gap-3">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t("common.search")}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="ps-9 h-10 rounded-full bg-muted/60 border-transparent"
+            />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
         <Table>
-          <TableHeader>
-            <TableRow>
+          <TableHeader className="bg-muted/30">
+            <TableRow className="hover:bg-transparent">
               <TableHead>{t("sales.invoice_number")}</TableHead>
               <TableHead>{t("sales.date")}</TableHead>
               <TableHead>{t("sales.customer")}</TableHead>
@@ -212,20 +272,21 @@ function Page() {
           <TableBody>
             {isLoading ? (
               <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.loading")}</TableCell></TableRow>
-            ) : invoices.length === 0 ? (
-              <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
-            ) : invoices.map((inv) => (
-              <TableRow key={inv.id} className="cursor-pointer hover:bg-muted/50" onClick={() => setDetailId(inv.id)}>
-                <TableCell className="font-mono font-medium">{inv.invoice_number}</TableCell>
-                <TableCell className="text-muted-foreground">{new Date(inv.invoice_date).toLocaleString()}</TableCell>
-                <TableCell>{customerName(inv.customer_id)}</TableCell>
-                <TableCell className="text-end tabular-nums">{fmt(Number(inv.total))}</TableCell>
+            ) : filteredInvoices.length === 0 ? (
+              <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
+            ) : filteredInvoices.map((inv) => (
+              <TableRow key={inv.id} className="cursor-pointer hover:bg-muted/40 transition-colors" onClick={() => setDetailId(inv.id)}>
+                <TableCell className="font-mono font-semibold text-primary">{inv.invoice_number}</TableCell>
+                <TableCell className="text-muted-foreground text-sm">{new Date(inv.invoice_date).toLocaleString()}</TableCell>
+                <TableCell className="font-medium">{customerName(inv.customer_id)}</TableCell>
+                <TableCell className="text-end tabular-nums font-semibold">{fmt(Number(inv.total))}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(inv.paid))}</TableCell>
-                <TableCell><Badge variant={statusVariant[inv.status]}>{t(`sales.statuses.${inv.status}`)}</Badge></TableCell>
+                <TableCell><Badge variant={statusVariant[inv.status]} className="rounded-full capitalize">{t(`sales.statuses.${inv.status}`)}</Badge></TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
