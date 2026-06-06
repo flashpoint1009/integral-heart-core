@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MapPin, Check, Clock, ChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/_authenticated/rep")({
+export const Route = createFileRoute("/_authenticated/rep/plan")({
   component: RepRoutePage,
 });
 
