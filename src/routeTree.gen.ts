@@ -117,6 +117,12 @@ const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFinanceRoute = (
+  await import('./routes/_authenticated/finance')
+).Route.update({ id: '/finance', path: '/finance', getParentRoute: () => AuthenticatedRouteRoute } as any)
+const AuthenticatedHrRoute = (
+  await import('./routes/_authenticated/hr')
+).Route.update({ id: '/hr', path: '/hr', getParentRoute: () => AuthenticatedRouteRoute } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
