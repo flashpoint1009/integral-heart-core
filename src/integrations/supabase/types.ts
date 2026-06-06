@@ -986,6 +986,54 @@ export type Database = {
           },
         ]
       }
+      landing_pricing_plans: {
+        Row: {
+          created_at: string
+          cta_label: string | null
+          features: Json
+          id: string
+          is_active: boolean
+          is_featured: boolean
+          name: string
+          period: string
+          price_egp: number
+          price_label: string | null
+          sort_order: number
+          tagline: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          cta_label?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name: string
+          period?: string
+          price_egp?: number
+          price_label?: string | null
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          cta_label?: string | null
+          features?: Json
+          id?: string
+          is_active?: boolean
+          is_featured?: boolean
+          name?: string
+          period?: string
+          price_egp?: number
+          price_label?: string | null
+          sort_order?: number
+          tagline?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       late_permissions: {
         Row: {
           created_at: string

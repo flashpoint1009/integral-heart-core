@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicPricingPlans } from "@/lib/api/pricing.functions";
 import {
   ArrowLeft, Sparkles, ShieldCheck, Zap, BarChart3, Boxes, ShoppingCart,
   Users, Truck, Cloud, Smartphone, Globe, CheckCircle2, Star,
@@ -27,6 +30,14 @@ function Landing() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const pricingFn = useServerFn(getPublicPricingPlans);
+  const { data: pricingData } = useQuery({
+    queryKey: ["public_pricing_plans"],
+    queryFn: () => pricingFn(),
+  });
+  const plans = pricingData?.plans ?? [];
+  const fmt = new Intl.NumberFormat("ar-EG");
 
   return (
     <div dir="rtl" className="relative min-h-screen overflow-hidden bg-[#050816] text-white antialiased">
@@ -300,53 +311,65 @@ function Landing() {
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center mb-14">
             <h2 className="text-4xl md:text-5xl font-bold">باقات بسيطة، قيمة هائلة</h2>
-            <p className="mt-3 text-white/60">ابدأ مجاناً، وارتقِ حين تكبر.</p>
+            <p className="mt-3 text-white/60">أسعار بالجنيه المصري — ابدأ مجاناً، وارتقِ حين تكبر.</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { n: "البداية", p: "0", d: "للأعمال الصغيرة", f: ["مستخدم واحد", "حتى 100 فاتورة/شهر", "مخزون أساسي", "دعم بريد"], h: false },
-              { n: "الاحترافي", p: "299", d: "الأكثر شيوعاً", f: ["10 مستخدمين", "فواتير غير محدودة", "POS + مندوبين", "تقارير متقدمة", "دعم أولوية"], h: true },
-              { n: "المؤسسات", p: "حسب الطلب", d: "للشركات الكبرى", f: ["مستخدمون غير محدود", "وحدات مخصصة", "API كامل", "مدير حساب مخصص", "SLA 99.99%"], h: false },
-            ].map((p, i) => (
-              <div
-                key={i}
-                className={`relative rounded-2xl p-8 border backdrop-blur transition-all hover:-translate-y-1 ${
-                  p.h
-                    ? "border-cyan-400/50 bg-gradient-to-b from-cyan-500/10 to-indigo-500/5 shadow-[0_0_40px_rgba(34,211,238,0.25)]"
-                    : "border-white/10 bg-white/[0.03]"
-                }`}
-              >
-                {p.h && (
-                  <div className="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 px-3 py-1 text-xs font-bold text-[#050816]">
-                    الأكثر شعبية
+          {plans.length === 0 ? (
+            <div className="text-center text-white/40 py-12">لا توجد باقات نشطة حالياً.</div>
+          ) : (
+            <div className={`grid gap-6 ${plans.length === 1 ? "max-w-md mx-auto" : plans.length === 2 ? "md:grid-cols-2 max-w-4xl mx-auto" : "md:grid-cols-3"}`}>
+              {plans.map((p) => {
+                const isFree = !p.price_label && Number(p.price_egp) === 0;
+                return (
+                  <div
+                    key={p.id}
+                    className={`relative rounded-2xl p-8 border backdrop-blur transition-all hover:-translate-y-1 ${
+                      p.is_featured
+                        ? "border-cyan-400/50 bg-gradient-to-b from-cyan-500/10 to-indigo-500/5 shadow-[0_0_40px_rgba(34,211,238,0.25)]"
+                        : "border-white/10 bg-white/[0.03]"
+                    }`}
+                  >
+                    {p.is_featured && (
+                      <div className="absolute -top-3 right-6 rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 px-3 py-1 text-xs font-bold text-[#050816]">
+                        الأكثر شعبية
+                      </div>
+                    )}
+                    <div className="text-sm text-white/60">{p.name}</div>
+                    <div className="mt-3 flex items-baseline gap-2 flex-wrap">
+                      {p.price_label ? (
+                        <span className="text-3xl font-black">{p.price_label}</span>
+                      ) : isFree ? (
+                        <span className="text-4xl font-black">مجاناً</span>
+                      ) : (
+                        <>
+                          <span className="text-4xl font-black">{fmt.format(Number(p.price_egp))}</span>
+                          <span className="text-white/70 text-sm font-bold">ج.م</span>
+                          {p.period && <span className="text-white/50 text-sm">/ {p.period}</span>}
+                        </>
+                      )}
+                    </div>
+                    {p.tagline && <div className="mt-1 text-sm text-white/50">{p.tagline}</div>}
+                    <ul className="mt-6 space-y-3">
+                      {p.features.map((x, j) => (
+                        <li key={j} className="flex items-center gap-2 text-sm text-white/80">
+                          <CheckCircle2 className="h-4 w-4 text-cyan-300 shrink-0" /> {x}
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      to="/auth"
+                      className={`mt-8 inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold transition ${
+                        p.is_featured
+                          ? "bg-gradient-to-r from-cyan-400 to-indigo-500 text-[#050816] hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]"
+                          : "border border-white/15 text-white hover:bg-white/5"
+                      }`}
+                    >
+                      {p.cta_label || "ابدأ الآن"}
+                    </Link>
                   </div>
-                )}
-                <div className="text-sm text-white/60">{p.n}</div>
-                <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-4xl font-black">{p.p}</span>
-                  {p.p !== "حسب الطلب" && <span className="text-white/50 text-sm">ر.س/شهر</span>}
-                </div>
-                <div className="mt-1 text-sm text-white/50">{p.d}</div>
-                <ul className="mt-6 space-y-3">
-                  {p.f.map((x, j) => (
-                    <li key={j} className="flex items-center gap-2 text-sm text-white/80">
-                      <CheckCircle2 className="h-4 w-4 text-cyan-300 shrink-0" /> {x}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to="/auth"
-                  className={`mt-8 inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold transition ${
-                    p.h
-                      ? "bg-gradient-to-r from-cyan-400 to-indigo-500 text-[#050816] hover:shadow-[0_0_30px_rgba(34,211,238,0.6)]"
-                      : "border border-white/15 text-white hover:bg-white/5"
-                  }`}
-                >
-                  ابدأ الآن
-                </Link>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 

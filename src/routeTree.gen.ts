@@ -51,6 +51,7 @@ import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authent
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
 import { Route as AuthenticatedNotificationsSendRouteImport } from './routes/_authenticated/notifications.send'
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
+import { Route as AuthenticatedDeveloperPricingRouteImport } from './routes/_authenticated/developer.pricing'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
 import { Route as AuthenticatedDeveloperBrandingRouteImport } from './routes/_authenticated/developer.branding'
 import { Route as AuthenticatedDeveloperBackupRouteImport } from './routes/_authenticated/developer.backup'
@@ -284,6 +285,12 @@ const AuthenticatedDeveloperTenantsRoute =
     path: '/tenants',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
+const AuthenticatedDeveloperPricingRoute =
+  AuthenticatedDeveloperPricingRouteImport.update({
+    id: '/pricing',
+    path: '/pricing',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedDeveloperModulesRoute =
   AuthenticatedDeveloperModulesRouteImport.update({
     id: '/modules',
@@ -375,6 +382,7 @@ export interface FileRoutesByFullPath {
   '/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/developer/pricing': typeof AuthenticatedDeveloperPricingRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -423,6 +431,7 @@ export interface FileRoutesByTo {
   '/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/developer/pricing': typeof AuthenticatedDeveloperPricingRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -477,6 +486,7 @@ export interface FileRoutesById {
   '/_authenticated/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/_authenticated/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
+  '/_authenticated/developer/pricing': typeof AuthenticatedDeveloperPricingRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/notifications/send': typeof AuthenticatedNotificationsSendRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/developer/backup'
     | '/developer/branding'
     | '/developer/modules'
+    | '/developer/pricing'
     | '/developer/tenants'
     | '/notifications/send'
     | '/rep/attendance'
@@ -579,6 +590,7 @@ export interface FileRouteTypes {
     | '/developer/backup'
     | '/developer/branding'
     | '/developer/modules'
+    | '/developer/pricing'
     | '/developer/tenants'
     | '/notifications/send'
     | '/rep/attendance'
@@ -632,6 +644,7 @@ export interface FileRouteTypes {
     | '/_authenticated/developer/backup'
     | '/_authenticated/developer/branding'
     | '/_authenticated/developer/modules'
+    | '/_authenticated/developer/pricing'
     | '/_authenticated/developer/tenants'
     | '/_authenticated/notifications/send'
     | '/_authenticated/rep/attendance'
@@ -952,6 +965,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeveloperTenantsRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
+    '/_authenticated/developer/pricing': {
+      id: '/_authenticated/developer/pricing'
+      path: '/pricing'
+      fullPath: '/developer/pricing'
+      preLoaderRoute: typeof AuthenticatedDeveloperPricingRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
     '/_authenticated/developer/modules': {
       id: '/_authenticated/developer/modules'
       path: '/modules'
@@ -1069,6 +1089,7 @@ interface AuthenticatedDeveloperRouteChildren {
   AuthenticatedDeveloperBackupRoute: typeof AuthenticatedDeveloperBackupRoute
   AuthenticatedDeveloperBrandingRoute: typeof AuthenticatedDeveloperBrandingRoute
   AuthenticatedDeveloperModulesRoute: typeof AuthenticatedDeveloperModulesRoute
+  AuthenticatedDeveloperPricingRoute: typeof AuthenticatedDeveloperPricingRoute
   AuthenticatedDeveloperTenantsRoute: typeof AuthenticatedDeveloperTenantsRoute
   AuthenticatedDeveloperIndexRoute: typeof AuthenticatedDeveloperIndexRoute
 }
@@ -1079,6 +1100,7 @@ const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
     AuthenticatedDeveloperBackupRoute: AuthenticatedDeveloperBackupRoute,
     AuthenticatedDeveloperBrandingRoute: AuthenticatedDeveloperBrandingRoute,
     AuthenticatedDeveloperModulesRoute: AuthenticatedDeveloperModulesRoute,
+    AuthenticatedDeveloperPricingRoute: AuthenticatedDeveloperPricingRoute,
     AuthenticatedDeveloperTenantsRoute: AuthenticatedDeveloperTenantsRoute,
     AuthenticatedDeveloperIndexRoute: AuthenticatedDeveloperIndexRoute,
   }
