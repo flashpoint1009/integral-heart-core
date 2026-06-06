@@ -12,7 +12,8 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Truck, Wallet, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/suppliers")({
@@ -106,9 +107,29 @@ function Page() {
     <div className="p-6 space-y-4">
       <PageHeader title={t("suppliers.title")} actions={<Button onClick={openAdd}><Plus className="me-2 h-4 w-4" />{t("suppliers.add")}</Button>} />
 
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          { label: t("suppliers.title"), value: rows.length, icon: Truck, tint: "from-primary/10 to-primary/0", color: "text-primary" },
+          { label: t("suppliers.balance"), value: rows.reduce((s, r) => s + Number(r.balance || 0), 0).toFixed(2), icon: Wallet, tint: "from-amber-500/10 to-amber-500/0", color: "text-amber-600" },
+          { label: t("common.active"), value: rows.filter((r) => r.is_active).length, icon: CheckCircle2, tint: "from-emerald-500/10 to-emerald-500/0", color: "text-emerald-600" },
+        ].map((c) => (
+          <Card key={c.label} className={`bg-gradient-to-br ${c.tint} border-border/60`}>
+            <CardContent className="pt-5 flex items-center justify-between">
+              <div>
+                <div className="text-xs text-muted-foreground">{c.label}</div>
+                <div className="text-2xl font-bold tabular-nums mt-1">{c.value}</div>
+              </div>
+              <div className={`h-10 w-10 rounded-xl bg-background/60 grid place-items-center ${c.color}`}>
+                <c.icon className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <div className="relative max-w-sm">
         <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input className="ps-9" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Input className="ps-9 rounded-full shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
       <div className="rounded-md border bg-card">
@@ -129,12 +150,12 @@ function Page() {
             ) : filtered.length === 0 ? (
               <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
             ) : filtered.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-medium">{r.name}</TableCell>
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">{r.name}</TableCell>
                 <TableCell>{r.phone ?? "—"}</TableCell>
                 <TableCell>{r.email ?? "—"}</TableCell>
-                <TableCell>{Number(r.balance).toFixed(2)}</TableCell>
-                <TableCell><Badge variant={r.is_active ? "default" : "secondary"}>{r.is_active ? t("common.active") : t("common.inactive")}</Badge></TableCell>
+                <TableCell className="tabular-nums">{Number(r.balance).toFixed(2)}</TableCell>
+                <TableCell><Badge className="rounded-full" variant={r.is_active ? "default" : "outline"}>{r.is_active ? t("common.active") : t("common.inactive")}</Badge></TableCell>
                 <TableCell className="text-end">
                   <Button variant="ghost" size="icon" onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => { if (confirm(t("common.deleteConfirm"))) del.mutate(r.id); }}><Trash2 className="h-4 w-4 text-destructive" /></Button>
