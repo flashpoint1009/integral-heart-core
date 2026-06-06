@@ -81,7 +81,9 @@
     "admin": "Administrator",
     "manager": "Manager",
     "cashier": "Cashier",
-    "accountant": "Accountant"
+    "accountant": "Accountant",
+    "sales_rep": "Sales Rep",
+    "supervisor": "Supervisor"
   },
   "categories": {
     "title": "Categories",
@@ -287,7 +289,7 @@
   },
   "finance": {
     "title": "Finance & Accounting",
-    "description": "Manage cash, expenses, payments, transfers and journal entries",
+    "description": "Description",
     "accounts": "Cash & Banks",
     "expenses": "Expenses",
     "transfers": "Transfers",
@@ -322,19 +324,25 @@
     "from": "From",
     "to": "To",
     "code": "Code",
-    "description": "Description",
     "debit": "Debit",
     "credit": "Credit",
     "noEntries": "No journal entries yet",
-    "types": { "cash": "Cash", "bank": "Bank" },
-    "coaTypes": { "asset": "Assets", "liability": "Liabilities", "equity": "Equity", "income": "Income", "expense": "Expenses" },
+    "types": {
+      "cash": "Cash",
+      "bank": "Bank"
+    },
+    "coaTypes": {
+      "asset": "Assets",
+      "liability": "Liabilities",
+      "equity": "Equity",
+      "income": "Income",
+      "expense": "Expenses"
+    },
     "trialBalance": "Trial Balance",
     "totalDebit": "Total Debit",
     "totalCredit": "Total Credit",
     "balanceCheck": "Difference",
     "balanced": "Balanced ✓",
-    "balance": "Balance",
-    "accountType": "Type",
     "total": "Total"
   },
   "hr": {
@@ -380,13 +388,23 @@
     "approve": "Approve",
     "reject": "Reject",
     "totalRequests": "Total Requests",
-    "leaveTypes": { "annual": "Annual", "casual": "Casual", "sick": "Sick", "unpaid": "Unpaid", "other": "Other" },
+    "leaveTypes": {
+      "annual": "Annual",
+      "casual": "Casual",
+      "sick": "Sick",
+      "unpaid": "Unpaid",
+      "other": "Other"
+    },
     "period": "Period",
     "employeesCount": "Employees",
     "totalNet": "Total Net",
     "generatePayroll": "Generate Payroll",
     "noPayrollYet": "No payroll generated for this period yet",
-    "runStatus": { "draft": "Draft", "approved": "Approved", "paid": "Paid" },
+    "runStatus": {
+      "draft": "Draft",
+      "approved": "Approved",
+      "paid": "Paid"
+    },
     "penalties": "Penalties",
     "advances": "Advances",
     "addPenalty": "Add Penalty",
@@ -421,6 +439,53 @@
     "addBonus": "Add Bonus / Incentive",
     "bonusType": "Type",
     "total": "Total",
-    "bonusTypes": { "incentive": "Incentive", "bonus": "Bonus", "overtime": "Overtime" }
+    "bonusTypes": {
+      "incentive": "Incentive",
+      "bonus": "Bonus",
+      "overtime": "Overtime"
+    }
+  },
+  "rep": {
+    "appName": "Sales Rep App",
+    "home": "Home",
+    "attendance": "Attendance",
+    "customers": "Customers",
+    "routeToday": "Today Route",
+    "quickSale": "Quick Sale",
+    "greeting": "Welcome back",
+    "dashboardTitle": "A new working day",
+    "dayActive": "Day in progress",
+    "dayEnded": "Day ended",
+    "notCheckedIn": "Not checked in",
+    "todaySales": "Today sales",
+    "visitsCount": "Visits today",
+    "routeProgress": "Route progress",
+    "checkIn": "Check-in time",
+    "status": "Status",
+    "checkInTime": "Check-in",
+    "checkOutTime": "Check-out",
+    "startDay": "Start day",
+    "endDay": "End day",
+    "dayCompleted": "Day completed",
+    "gpsHint": "Your location is captured automatically",
+    "checkedIn": "Checked in",
+    "checkedOut": "Checked out",
+    "addCustomer": "Add customer",
+    "landmark": "Landmark",
+    "landmarkHint": "Next to / in front of / behind",
+    "captureLocation": "Capture GPS",
+    "gpsCaptured": "Location captured",
+    "gpsFailed": "Failed to capture location",
+    "balance": "Balance",
+    "searchProduct": "Search product",
+    "cartEmpty": "Cart is empty",
+    "saveAndPrint": "Save & print",
+    "routeHint": "Planned customers for today",
+    "noRoute": "No route planned for today",
+    "routeStatus": {
+      "pending": "Pending",
+      "done": "Done",
+      "skipped": "Skipped"
+    }
   }
 }
