@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { Home, MapPin, Users, ShoppingCart, Calendar, LogOut } from "lucide-react";
+import { Home, MapPin, Users, ShoppingCart, Calendar, LogOut, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 
@@ -24,8 +24,8 @@ function RepLayout() {
   const tabs = [
     { to: "/rep", icon: Home, label: t("rep.home") },
     { to: "/rep/plan", icon: Calendar, label: t("rep.routeToday") },
-    { to: "/rep/customers", icon: Users, label: t("rep.customers") },
     { to: "/rep/sale", icon: ShoppingCart, label: t("rep.quickSale") },
+    { to: "/rep/requests", icon: FileText, label: "طلباتي" },
     { to: "/rep/attendance", icon: MapPin, label: t("rep.attendance") },
   ];
 
