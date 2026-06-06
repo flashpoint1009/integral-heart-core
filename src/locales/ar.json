@@ -254,10 +254,8 @@
       "purchase": "شراء",
       "sale": "بيع",
       "adjustment": "تسوية",
-      "transfer_in": "تحويل وارد",
-      "transfer_out": "تحويل صادر",
-      "return_in": "مرتجع وارد",
-      "return_out": "مرتجع صادر"
+      "transfer": "تحويل",
+      "return": "مرتجع"
     }
   },
   "payments": {
