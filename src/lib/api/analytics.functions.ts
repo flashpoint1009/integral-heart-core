@@ -135,8 +135,8 @@ export const getRepPerformance = createServerFn({ method: "POST" })
 
     const { data: visits } = await supabase
       .from("rep_visits")
-      .select("id, employee_id, status, created_at, employees(full_name)")
-      .gte("created_at", since.toISOString());
+      .select("id, employee_id, outcome, started_at, invoice_id, employees(full_name)")
+      .gte("started_at", since.toISOString());
     const { data: invoices } = await supabase
       .from("sales_invoices")
       .select("id, total, rep_id, invoice_date")
@@ -144,10 +144,10 @@ export const getRepPerformance = createServerFn({ method: "POST" })
       .not("rep_id", "is", null);
 
     const repMap = new Map<string, { name: string; visits: number; completed: number; sales: number; invoices: number }>();
-    for (const v of (visits ?? []) as Array<{ employee_id: string; status: string; employees: { full_name: string } | null }>) {
+    for (const v of ((visits ?? []) as unknown) as Array<{ employee_id: string; outcome: string; invoice_id: string | null; employees: { full_name: string } | null }>) {
       const cur = repMap.get(v.employee_id) ?? { name: v.employees?.full_name ?? "—", visits: 0, completed: 0, sales: 0, invoices: 0 };
       cur.visits += 1;
-      if (v.status === "completed" || v.status === "done") cur.completed += 1;
+      if (v.outcome === "sold" || v.outcome === "collected") cur.completed += 1;
       repMap.set(v.employee_id, cur);
     }
     for (const inv of (invoices ?? []) as Array<{ rep_id: string; total: number }>) {
