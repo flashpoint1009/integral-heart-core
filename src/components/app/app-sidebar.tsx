@@ -15,6 +15,8 @@ import {
   Boxes,
   History,
   ShoppingBag,
+  Wallet,
+  UsersRound,
 } from "lucide-react";
 import {
   Sidebar,
@@ -61,6 +63,13 @@ export function AppSidebar() {
         { url: "/warehouses", icon: Warehouse, title: t("nav.warehouses") },
         { url: "/customers", icon: Users, title: t("nav.customers") },
         { url: "/suppliers", icon: Truck, title: t("nav.suppliers") },
+      ],
+    },
+    {
+      label: t("nav.finance"),
+      items: [
+        { url: "/finance", icon: Wallet, title: t("nav.financeHub") },
+        { url: "/hr", icon: UsersRound, title: t("nav.hr") },
       ],
     },
     {
