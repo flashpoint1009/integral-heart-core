@@ -2062,6 +2062,47 @@ export type Database = {
           },
         ]
       }
+      user_screen_permissions: {
+        Row: {
+          allowed: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          screen_key: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allowed?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          screen_key: string
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allowed?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          screen_key?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_screen_permissions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       warehouses: {
         Row: {
           address: string | null
@@ -2152,6 +2193,10 @@ export type Database = {
           _source_type: string
         }
         Returns: string
+      }
+      screen_allowed: {
+        Args: { _screen_key: string; _user_id: string }
+        Returns: boolean
       }
     }
     Enums: {
