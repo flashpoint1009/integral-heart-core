@@ -29,6 +29,7 @@ import {
   Package2,
   Bell,
   Palette,
+  Database,
 } from "lucide-react";
 import {
   Sidebar,
@@ -77,6 +78,7 @@ export function AppSidebar() {
         ...(isDeveloper ? [
           { url: "/developer/audit", icon: History, title: "سجل العمليات" } as Item,
           { url: "/developer/branding", icon: Palette, title: "شاشة الدخول" } as Item,
+          { url: "/developer/backup", icon: Database, title: "نسخ احتياطي" } as Item,
         ] : []),
       ],
     }] : []),

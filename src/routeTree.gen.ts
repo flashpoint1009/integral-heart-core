@@ -52,6 +52,7 @@ import { Route as AuthenticatedNotificationsSendRouteImport } from './routes/_au
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
 import { Route as AuthenticatedDeveloperBrandingRouteImport } from './routes/_authenticated/developer.branding'
+import { Route as AuthenticatedDeveloperBackupRouteImport } from './routes/_authenticated/developer.backup'
 import { Route as AuthenticatedDeveloperAuditRouteImport } from './routes/_authenticated/developer.audit'
 import { Route as AuthenticatedDashboardRepsRouteImport } from './routes/_authenticated/dashboard.reps'
 import { Route as AuthenticatedDashboardProfitabilityRouteImport } from './routes/_authenticated/dashboard.profitability'
@@ -289,6 +290,12 @@ const AuthenticatedDeveloperBrandingRoute =
     path: '/branding',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
+const AuthenticatedDeveloperBackupRoute =
+  AuthenticatedDeveloperBackupRouteImport.update({
+    id: '/backup',
+    path: '/backup',
+    getParentRoute: () => AuthenticatedDeveloperRoute,
+  } as any)
 const AuthenticatedDeveloperAuditRoute =
   AuthenticatedDeveloperAuditRouteImport.update({
     id: '/audit',
@@ -358,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
@@ -404,6 +412,7 @@ export interface FileRoutesByTo {
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
@@ -456,6 +465,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
   '/_authenticated/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/_authenticated/developer/audit': typeof AuthenticatedDeveloperAuditRoute
+  '/_authenticated/developer/backup': typeof AuthenticatedDeveloperBackupRoute
   '/_authenticated/developer/branding': typeof AuthenticatedDeveloperBrandingRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
@@ -508,6 +518,7 @@ export interface FileRouteTypes {
     | '/dashboard/profitability'
     | '/dashboard/reps'
     | '/developer/audit'
+    | '/developer/backup'
     | '/developer/branding'
     | '/developer/modules'
     | '/developer/tenants'
@@ -554,6 +565,7 @@ export interface FileRouteTypes {
     | '/dashboard/profitability'
     | '/dashboard/reps'
     | '/developer/audit'
+    | '/developer/backup'
     | '/developer/branding'
     | '/developer/modules'
     | '/developer/tenants'
@@ -605,6 +617,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profitability'
     | '/_authenticated/dashboard/reps'
     | '/_authenticated/developer/audit'
+    | '/_authenticated/developer/backup'
     | '/_authenticated/developer/branding'
     | '/_authenticated/developer/modules'
     | '/_authenticated/developer/tenants'
@@ -933,6 +946,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeveloperBrandingRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
+    '/_authenticated/developer/backup': {
+      id: '/_authenticated/developer/backup'
+      path: '/backup'
+      fullPath: '/developer/backup'
+      preLoaderRoute: typeof AuthenticatedDeveloperBackupRouteImport
+      parentRoute: typeof AuthenticatedDeveloperRoute
+    }
     '/_authenticated/developer/audit': {
       id: '/_authenticated/developer/audit'
       path: '/audit'
@@ -1005,6 +1025,7 @@ const AuthenticatedRepRouteRouteWithChildren =
 
 interface AuthenticatedDeveloperRouteChildren {
   AuthenticatedDeveloperAuditRoute: typeof AuthenticatedDeveloperAuditRoute
+  AuthenticatedDeveloperBackupRoute: typeof AuthenticatedDeveloperBackupRoute
   AuthenticatedDeveloperBrandingRoute: typeof AuthenticatedDeveloperBrandingRoute
   AuthenticatedDeveloperModulesRoute: typeof AuthenticatedDeveloperModulesRoute
   AuthenticatedDeveloperTenantsRoute: typeof AuthenticatedDeveloperTenantsRoute
@@ -1014,6 +1035,7 @@ interface AuthenticatedDeveloperRouteChildren {
 const AuthenticatedDeveloperRouteChildren: AuthenticatedDeveloperRouteChildren =
   {
     AuthenticatedDeveloperAuditRoute: AuthenticatedDeveloperAuditRoute,
+    AuthenticatedDeveloperBackupRoute: AuthenticatedDeveloperBackupRoute,
     AuthenticatedDeveloperBrandingRoute: AuthenticatedDeveloperBrandingRoute,
     AuthenticatedDeveloperModulesRoute: AuthenticatedDeveloperModulesRoute,
     AuthenticatedDeveloperTenantsRoute: AuthenticatedDeveloperTenantsRoute,
