@@ -15,7 +15,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Wallet, Receipt, ArrowLeftRight, Users, Truck, BookOpen, Landmark, TrendingDown, TrendingUp } from "lucide-react";
+import { Plus, Wallet, Receipt, ArrowLeftRight, Users, Truck, BookOpen, Landmark, TrendingDown, TrendingUp, Scale } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/finance")({
@@ -40,6 +40,7 @@ function Page() {
           <TabsTrigger value="sup" className="gap-2"><Truck className="h-4 w-4" />{t("finance.supplierPayments")}</TabsTrigger>
           <TabsTrigger value="coa" className="gap-2"><Landmark className="h-4 w-4" />{t("finance.chart")}</TabsTrigger>
           <TabsTrigger value="journal" className="gap-2"><BookOpen className="h-4 w-4" />{t("finance.journal")}</TabsTrigger>
+          <TabsTrigger value="trial" className="gap-2"><Scale className="h-4 w-4" />{t("finance.trialBalance")}</TabsTrigger>
         </TabsList>
         <TabsContent value="accounts" className="mt-4"><AccountsTab /></TabsContent>
         <TabsContent value="expenses" className="mt-4"><ExpensesTab /></TabsContent>
@@ -48,6 +49,7 @@ function Page() {
         <TabsContent value="sup" className="mt-4"><SupplierPaymentsTab /></TabsContent>
         <TabsContent value="coa" className="mt-4"><ChartTab /></TabsContent>
         <TabsContent value="journal" className="mt-4"><JournalTab /></TabsContent>
+        <TabsContent value="trial" className="mt-4"><TrialBalanceTab /></TabsContent>
       </Tabs>
     </div>
   );
