@@ -128,6 +128,24 @@ export type Database = {
           },
         ]
       }
+      app_secrets: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           check_in: string | null
@@ -218,6 +236,33 @@ export type Database = {
           table_name?: string
           user_email?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      auth_branding: {
+        Row: {
+          app_subtitle: string | null
+          app_title: string | null
+          hero_url: string | null
+          id: number
+          logo_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          app_subtitle?: string | null
+          app_title?: string | null
+          hero_url?: string | null
+          id?: number
+          logo_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          app_subtitle?: string | null
+          app_title?: string | null
+          hero_url?: string | null
+          id?: number
+          logo_url?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1055,6 +1100,45 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          link: string | null
+          sender_id: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          sender_id?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          sender_id?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       online_order_items: {
         Row: {
           id: string
@@ -1557,6 +1641,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       rep_check_ins: {
         Row: {
@@ -2445,6 +2559,28 @@ export type Database = {
       module_enabled: {
         Args: { _module_key: string; _tenant_id?: string }
         Returns: boolean
+      }
+      notify_role: {
+        Args: {
+          _body: string
+          _data: Json
+          _link: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _title: string
+          _type: string
+        }
+        Returns: number
+      }
+      notify_user: {
+        Args: {
+          _body: string
+          _data: Json
+          _link: string
+          _title: string
+          _type: string
+          _user_id: string
+        }
+        Returns: undefined
       }
       post_journal_auto: {
         Args: {
