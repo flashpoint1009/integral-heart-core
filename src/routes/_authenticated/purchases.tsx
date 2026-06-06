@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Plus, Trash2, ShoppingBag, Package, TrendingDown } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/purchases")({
@@ -99,16 +99,43 @@ function Page() {
   });
 
   return (
-    <div className="p-6 space-y-4">
-      <PageHeader title={t("purchases.title")} actions={
-        <Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("purchases.new")}</Button>
-      } />
+    <div className="p-6 space-y-6">
+      <PageHeader
+        title={t("purchases.title")}
+        description={t("purchases.subtitle", "إدارة فواتير الشراء واستلام البضائع من الموردين")}
+        actions={
+          <Button onClick={openNew} className="rounded-xl shadow-md h-10">
+            <Plus className="h-4 w-4 me-2" />{t("purchases.new")}
+          </Button>
+        }
+      />
 
-      <Card>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          { label: t("purchases.recent", "آخر العمليات"), value: recent.length.toString(), icon: ShoppingBag, bg: "bg-primary/10 text-primary" },
+          { label: t("purchases.totalQty", "إجمالي الكميات"), value: recent.reduce((s, r) => s + Number(r.quantity), 0).toString(), icon: Package, bg: "bg-emerald-500/10 text-emerald-600" },
+          { label: t("purchases.totalCost", "إجمالي التكلفة"), value: fmt(recent.reduce((s, r) => s + Number(r.quantity) * Number(r.unit_cost ?? 0), 0)), icon: TrendingDown, bg: "bg-amber-500/10 text-amber-600" },
+        ].map((s) => (
+          <Card key={s.label} className="border-border/60 shadow-sm">
+            <CardContent className="p-5 flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{s.label}</p>
+                <p className="text-2xl font-bold tabular-nums">{s.value}</p>
+              </div>
+              <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${s.bg}`}>
+                <s.icon className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <Card className="border-border/60 shadow-sm overflow-hidden rounded-2xl">
         <CardContent className="p-0">
+          <div className="overflow-x-auto">
           <Table>
-            <TableHeader>
-              <TableRow>
+            <TableHeader className="bg-muted/30">
+              <TableRow className="hover:bg-transparent">
                 <TableHead>{t("sales.date")}</TableHead>
                 <TableHead>{t("sales.product")}</TableHead>
                 <TableHead>{t("movements.warehouse")}</TableHead>
@@ -119,19 +146,20 @@ function Page() {
             </TableHeader>
             <TableBody>
               {recent.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
               ) : recent.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r.id} className="hover:bg-muted/40 transition-colors">
                   <TableCell className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleString()}</TableCell>
                   <TableCell className="font-medium">{i18n.language === "en" && r.products?.name_en ? r.products.name_en : r.products?.name_ar ?? "—"}</TableCell>
-                  <TableCell>{r.warehouses?.name ?? "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{r.warehouses?.name ?? "—"}</TableCell>
                   <TableCell className="text-end tabular-nums">{Number(r.quantity)}</TableCell>
                   <TableCell className="text-end tabular-nums">{fmt(Number(r.unit_cost ?? 0))}</TableCell>
-                  <TableCell className="text-end tabular-nums font-medium">{fmt(Number(r.quantity) * Number(r.unit_cost ?? 0))}</TableCell>
+                  <TableCell className="text-end tabular-nums font-semibold text-primary">{fmt(Number(r.quantity) * Number(r.unit_cost ?? 0))}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
