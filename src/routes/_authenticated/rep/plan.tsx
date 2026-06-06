@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Check, Clock, ChevronLeft } from "lucide-react";
+import { Check, Play } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/rep/plan")({
@@ -57,6 +57,11 @@ function RepRoutePage() {
                     {c?.address && <span className="truncate">· {c.address}</span>}
                   </div>
                 </div>
+                {!done && c?.id && (
+                  <Link to="/rep/visit/$customerId" params={{ customerId: c.id }} className="shrink-0">
+                    <button className="h-9 px-3 rounded-xl bg-primary text-primary-foreground text-xs font-semibold flex items-center gap-1"><Play className="h-3 w-3" />{t("rep.startVisit")}</button>
+                  </Link>
+                )}
                 <Badge variant={done ? "default" : skipped ? "outline" : "secondary"} className="text-[10px]">
                   {t(`rep.routeStatus.${r.status}`)}
                 </Badge>
