@@ -4,6 +4,43 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const DEFAULT_TENANT = "00000000-0000-0000-0000-000000000001";
 
+/** Convert a bucket path (or pass-through full URL) into a signed URL.
+ *  Returns the original string for empty/null/full http(s) URLs. */
+async function signIfPath(value: string | null | undefined): Promise<string | null> {
+  if (!value) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data } = await supabaseAdmin.storage.from("store-images").createSignedUrl(value, 60 * 60 * 24 * 7);
+  return data?.signedUrl ?? null;
+}
+
+async function signAllImages<T extends Record<string, any>>(cfg: T): Promise<T> {
+  const copy: any = { ...cfg };
+  copy.logo_url = await signIfPath(cfg.logo_url);
+  copy.hero_image = await signIfPath(cfg.hero_image);
+  if (Array.isArray(cfg.banners)) {
+    copy.banners = await Promise.all(
+      (cfg.banners as any[]).map(async (b) => ({ ...b, image: await signIfPath(b?.image) })),
+    );
+  }
+  if (Array.isArray(cfg.sections)) {
+    copy.sections = await Promise.all(
+      (cfg.sections as any[]).map(async (s) => {
+        if (!s?.props) return s;
+        const p: any = { ...s.props };
+        if (p.image) p.image = await signIfPath(p.image);
+        if (p.url) p.url = await signIfPath(p.url);
+        return { ...s, props: p };
+      }),
+    );
+  }
+  return copy;
+}
+
+async function signProductImages(products: any[]): Promise<any[]> {
+  return Promise.all(products.map(async (p) => ({ ...p, image_url: await signIfPath(p.image_url) })));
+}
+
 export const getSiteConfigPublic = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: cfg } = await supabaseAdmin
@@ -20,7 +57,9 @@ export const getSiteConfigPublic = createServerFn({ method: "GET" }).handler(asy
     .select("id, name_ar, name_en, sale_price, image_url, category_id, description")
     .eq("is_active", true)
     .limit(200);
-  return { config: cfg, categories: cats ?? [], products: products ?? [] };
+  const signedCfg = cfg ? await signAllImages(cfg) : null;
+  const signedProducts = await signProductImages(products ?? []);
+  return { config: signedCfg, categories: cats ?? [], products: signedProducts };
 });
 
 export const saveSiteConfig = createServerFn({ method: "POST" })
@@ -30,9 +69,27 @@ export const saveSiteConfig = createServerFn({ method: "POST" })
       site_name: z.string().min(1).max(200),
       logo_url: z.string().max(500).nullable().optional(),
       primary_color: z.string().max(20),
+      secondary_color: z.string().max(20).nullable().optional(),
+      theme_preset: z.enum(["modern", "elegant", "bold", "minimal", "classic"]).default("modern"),
       card_shape: z.enum(["square", "rounded", "circle"]),
       contact_phone: z.string().max(40).nullable().optional(),
       contact_address: z.string().max(500).nullable().optional(),
+      enable_search: z.boolean().default(true),
+      enable_menu: z.boolean().default(true),
+      nav_items: z.array(z.object({
+        id: z.string(),
+        label: z.string().max(80),
+        url: z.string().max(300),
+      })).max(20).default([]),
+      banners: z.array(z.object({
+        id: z.string(),
+        image: z.string().max(500).nullable().optional(),
+        title: z.string().max(200).optional(),
+        subtitle: z.string().max(300).optional(),
+        link: z.string().max(300).optional(),
+      })).max(10).default([]),
+      hero_image: z.string().max(500).nullable().optional(),
+      custom_domain: z.string().max(200).nullable().optional(),
       sections: z.array(z.any()).max(50),
       is_published: z.boolean(),
     }).parse(d),
@@ -43,6 +100,27 @@ export const saveSiteConfig = createServerFn({ method: "POST" })
       .upsert({ tenant_id: DEFAULT_TENANT, ...data }, { onConflict: "tenant_id" });
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+/** Returns a signed upload URL the client uses to PUT directly to storage. */
+export const getUploadUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({
+    folder: z.enum(["banners", "logo", "hero", "sections", "products"]).default("banners"),
+    ext: z.string().max(10).default("jpg"),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const safeExt = (data.ext || "jpg").replace(/[^a-zA-Z0-9]/g, "").slice(0, 6) || "jpg";
+    const path = `${data.folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from("store-images")
+      .createSignedUploadUrl(path);
+    if (error) throw new Error(error.message);
+    const { data: preview } = await supabaseAdmin.storage
+      .from("store-images")
+      .createSignedUrl(path, 60 * 60 * 24 * 7);
+    return { path, signedUrl: signed.signedUrl, token: signed.token, previewUrl: preview?.signedUrl ?? null };
   });
 
 export const createOnlineOrder = createServerFn({ method: "POST" })

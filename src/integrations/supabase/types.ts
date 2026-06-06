@@ -1923,39 +1923,63 @@ export type Database = {
       }
       site_config: {
         Row: {
+          banners: Json | null
           card_shape: string
           contact_address: string | null
           contact_phone: string | null
+          custom_domain: string | null
+          enable_menu: boolean | null
+          enable_search: boolean | null
+          hero_image: string | null
           is_published: boolean
           logo_url: string | null
+          nav_items: Json | null
           primary_color: string
+          secondary_color: string | null
           sections: Json
           site_name: string
           tenant_id: string
+          theme_preset: string | null
           updated_at: string
         }
         Insert: {
+          banners?: Json | null
           card_shape?: string
           contact_address?: string | null
           contact_phone?: string | null
+          custom_domain?: string | null
+          enable_menu?: boolean | null
+          enable_search?: boolean | null
+          hero_image?: string | null
           is_published?: boolean
           logo_url?: string | null
+          nav_items?: Json | null
           primary_color?: string
+          secondary_color?: string | null
           sections?: Json
           site_name?: string
           tenant_id: string
+          theme_preset?: string | null
           updated_at?: string
         }
         Update: {
+          banners?: Json | null
           card_shape?: string
           contact_address?: string | null
           contact_phone?: string | null
+          custom_domain?: string | null
+          enable_menu?: boolean | null
+          enable_search?: boolean | null
+          hero_image?: string | null
           is_published?: boolean
           logo_url?: string | null
+          nav_items?: Json | null
           primary_color?: string
+          secondary_color?: string | null
           sections?: Json
           site_name?: string
           tenant_id?: string
+          theme_preset?: string | null
           updated_at?: string
         }
         Relationships: [
