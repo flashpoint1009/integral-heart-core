@@ -29,6 +29,7 @@ import { Route as AuthenticatedFinanceRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedCustomersRouteImport } from './routes/_authenticated/customers'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep.index'
+import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep.customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep.attendance'
 
 const AuthRoute = AuthRouteImport.update({
@@ -130,6 +131,12 @@ const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRepRoute,
 } as any)
+const AuthenticatedRepCustomersRoute =
+  AuthenticatedRepCustomersRouteImport.update({
+    id: '/customers',
+    path: '/customers',
+    getParentRoute: () => AuthenticatedRepRoute,
+  } as any)
 const AuthenticatedRepAttendanceRoute =
   AuthenticatedRepAttendanceRouteImport.update({
     id: '/attendance',
@@ -157,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
+  '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRoutesByTo {
@@ -178,6 +186,7 @@ export interface FileRoutesByTo {
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/': typeof AuthenticatedIndexRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
+  '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRoutesById {
@@ -202,6 +211,7 @@ export interface FileRoutesById {
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
+  '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRouteTypes {
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/warehouses'
     | '/rep/attendance'
+    | '/rep/customers'
     | '/rep/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/warehouses'
     | '/'
     | '/rep/attendance'
+    | '/rep/customers'
     | '/rep'
   id:
     | '__root__'
@@ -270,6 +282,7 @@ export interface FileRouteTypes {
     | '/_authenticated/warehouses'
     | '/_authenticated/'
     | '/_authenticated/rep/attendance'
+    | '/_authenticated/rep/customers'
     | '/_authenticated/rep/'
   fileRoutesById: FileRoutesById
 }
@@ -420,6 +433,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepIndexRouteImport
       parentRoute: typeof AuthenticatedRepRoute
     }
+    '/_authenticated/rep/customers': {
+      id: '/_authenticated/rep/customers'
+      path: '/customers'
+      fullPath: '/rep/customers'
+      preLoaderRoute: typeof AuthenticatedRepCustomersRouteImport
+      parentRoute: typeof AuthenticatedRepRoute
+    }
     '/_authenticated/rep/attendance': {
       id: '/_authenticated/rep/attendance'
       path: '/attendance'
@@ -432,11 +452,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRepRouteChildren {
   AuthenticatedRepAttendanceRoute: typeof AuthenticatedRepAttendanceRoute
+  AuthenticatedRepCustomersRoute: typeof AuthenticatedRepCustomersRoute
   AuthenticatedRepIndexRoute: typeof AuthenticatedRepIndexRoute
 }
 
 const AuthenticatedRepRouteChildren: AuthenticatedRepRouteChildren = {
   AuthenticatedRepAttendanceRoute: AuthenticatedRepAttendanceRoute,
+  AuthenticatedRepCustomersRoute: AuthenticatedRepCustomersRoute,
   AuthenticatedRepIndexRoute: AuthenticatedRepIndexRoute,
 }
 
