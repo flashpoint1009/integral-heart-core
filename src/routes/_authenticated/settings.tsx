@@ -164,6 +164,23 @@ function Page() {
               <Input disabled={!isAdmin} type="number" min={20} max={5000} step="10" value={form.extra?.office_radius_m ?? 150} onChange={(e) => setExtra("office_radius_m", Number(e.target.value))} />
             </div>
           </div>
+          <p className="text-[11px] text-muted-foreground">ملاحظة: المندوبون والمشرفون الميدانيون لا يخضعون لشرط النطاق ويستطيعون تسجيل الحضور من أي مكان.</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <div>
+            <div className="font-semibold">دورة احتساب الراتب</div>
+            <p className="text-xs text-muted-foreground mt-1">حدّد أول يوم في دورة الراتب الشهرية. الموظف الجديد يُحتسب راتبه من يوم تعيينه فقط (تناسبياً).</p>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-1.5">
+              <Label>يوم بداية الدورة</Label>
+              <Input disabled={!isAdmin} type="number" min={1} max={28} step="1" value={form.extra?.payroll_cycle_start_day ?? 1} onChange={(e) => setExtra("payroll_cycle_start_day", Math.min(28, Math.max(1, Number(e.target.value) || 1)))} />
+              <p className="text-[11px] text-muted-foreground">مثال: 26 = الدورة من 26 الشهر الحالي إلى 25 الشهر التالي.</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
