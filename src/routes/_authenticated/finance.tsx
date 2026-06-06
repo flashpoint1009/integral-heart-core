@@ -668,7 +668,7 @@ function TrialBalanceTab() {
                 <TableRow key={r.account_id} className="hover:bg-muted/40">
                   <TableCell className="font-mono text-muted-foreground">{r.code}</TableCell>
                   <TableCell className="font-semibold text-primary">{isAr ? r.name_ar : (r.name_en || r.name_ar)}</TableCell>
-                  <TableCell><Badge variant="outline" className="rounded-full">{t(`finance.types.${r.type}`)}</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className="rounded-full">{t(`finance.coaTypes.${r.type}`)}</Badge></TableCell>
                   <TableCell className="text-end tabular-nums">{fmt(Number(r.total_debit))}</TableCell>
                   <TableCell className="text-end tabular-nums">{fmt(Number(r.total_credit))}</TableCell>
                   <TableCell className={`text-end tabular-nums font-semibold ${bal >= 0 ? "text-emerald-700" : "text-rose-700"}`}>{fmt(bal)}</TableCell>
