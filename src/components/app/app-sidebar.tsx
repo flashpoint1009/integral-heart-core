@@ -22,6 +22,9 @@ import {
   Crown,
   Layers,
   Building2,
+  Sparkles,
+  PieChart,
+  Trophy,
 } from "lucide-react";
 import {
   Sidebar,
@@ -105,6 +108,10 @@ export function AppSidebar() {
       label: t("nav.system"),
       items: [
         { url: "/reports", icon: BarChart3, title: t("nav.reports"), module: "reports" },
+        { url: "/dashboard/executive", icon: BarChart3, title: "داشبورد تنفيذي", module: "reports" },
+        { url: "/dashboard/forecast", icon: Sparkles, title: "توقع AI", module: "reports" },
+        { url: "/dashboard/profitability", icon: PieChart, title: "تحليل الربحية", module: "reports" },
+        { url: "/dashboard/reps", icon: Trophy, title: "أداء المندوبين", module: "rep" },
         { url: "/users", icon: UserCog, title: t("nav.users") },
         { url: "/settings", icon: Settings, title: t("nav.settings") },
       ],
