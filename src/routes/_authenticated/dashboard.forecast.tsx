@@ -23,9 +23,11 @@ function Page() {
 
   if (isLoading || !data) return <div className="p-6 text-muted-foreground">جاري التحليل بالذكاء الاصطناعي…</div>;
 
+  type ForecastItem = { month: string; predicted: number; confidence: string };
+  const forecast = (data.forecast as unknown) as ForecastItem[];
   const combined = [
     ...data.history.map((h) => ({ month: h.month, actual: h.sales, predicted: null as number | null })),
-    ...data.forecast.map((f) => ({ month: f.month, actual: null as number | null, predicted: f.predicted })),
+    ...forecast.map((f) => ({ month: f.month, actual: null as number | null, predicted: f.predicted })),
   ];
 
   return (
@@ -66,7 +68,7 @@ function Page() {
         <CardHeader><CardTitle>تفاصيل التوقعات</CardTitle></CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-3 gap-3">
-            {data.forecast.map((f) => (
+            {forecast.map((f) => (
               <div key={f.month} className="rounded-xl border p-4 bg-card">
                 <div className="text-xs text-muted-foreground">{f.month}</div>
                 <div className="text-2xl font-bold mt-1">{Number(f.predicted).toLocaleString(undefined, { maximumFractionDigits: 0 })}</div>
