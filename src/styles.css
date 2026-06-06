@@ -148,3 +148,12 @@
   html[dir="rtl"] body { font-family: 'Cairo', system-ui, sans-serif; }
   html[dir="ltr"] body { font-family: 'Inter', system-ui, sans-serif; }
 }
+
+@media print {
+  body * { visibility: hidden !important; }
+  #invoice-print, #invoice-print * { visibility: visible !important; }
+  #invoice-print { position: absolute; inset: 0; padding: 24px; background: white; color: black; }
+  .print\:hidden { display: none !important; }
+  [data-radix-popper-content-wrapper], [data-radix-portal], [role="dialog"] [data-overlay] { display: none !important; }
+  [role="dialog"] { position: static !important; transform: none !important; box-shadow: none !important; border: none !important; max-width: none !important; max-height: none !important; padding: 0 !important; }
+}
