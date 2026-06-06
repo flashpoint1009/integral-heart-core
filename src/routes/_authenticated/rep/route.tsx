@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth-context";
 import { Home, MapPin, Users, ShoppingCart, Calendar, LogOut, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { InstallPwaButton } from "@/components/app/install-pwa-button";
 
 export const Route = createFileRoute("/_authenticated/rep")({
   component: RepLayout,
@@ -40,9 +41,12 @@ function RepLayout() {
             <div className="text-[10px] text-muted-foreground truncate max-w-[180px]">{user?.email}</div>
           </div>
         </div>
-        <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/auth", replace: true }); }}>
-          <LogOut className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <InstallPwaButton compact />
+          <Button size="sm" variant="ghost" onClick={async () => { await signOut(); navigate({ to: "/auth", replace: true }); }}>
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
       </header>
 
       <main className="flex-1 overflow-auto pb-20">
