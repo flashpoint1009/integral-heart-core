@@ -1,7 +1,7 @@
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app/app-sidebar";
 import { Topbar } from "@/components/app/topbar";
 import { Loader2 } from "lucide-react";
@@ -29,15 +29,26 @@ function AuthLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          <Topbar />
-          <main className="flex-1 overflow-auto">
-            <Outlet />
-          </main>
-        </div>
-      </div>
+      <LayoutShell />
     </SidebarProvider>
+  );
+}
+
+function LayoutShell() {
+  const { open, setOpen, isMobile, openMobile, setOpenMobile } = useSidebar();
+  const closeIfOpen = () => {
+    if (isMobile && openMobile) setOpenMobile(false);
+    else if (!isMobile && open) setOpen(false);
+  };
+  return (
+    <div className="min-h-screen flex w-full bg-background">
+      <div className="flex-1 flex flex-col min-w-0" onClick={closeIfOpen}>
+        <Topbar />
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div>
+      <AppSidebar />
+    </div>
   );
 }
