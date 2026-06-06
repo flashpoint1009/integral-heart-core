@@ -272,5 +272,14 @@
     "details": "Invoice Details",
     "print": "Print",
     "items": "Items"
+  },
+  "purchases": {
+    "title": "Purchases",
+    "new": "New Purchase",
+    "supplier": "Supplier",
+    "selectSupplier": "Select supplier",
+    "noSupplier": "No supplier",
+    "warehouse": "Receiving Warehouse",
+    "save": "Save Purchase"
   }
 }
