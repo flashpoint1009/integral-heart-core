@@ -26,11 +26,19 @@ export const Route = createFileRoute("/_authenticated/hr")({
 });
 
 const fmt = (n: number) => Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const monthRange = (yyyymm: string) => {
+const monthRange = (yyyymm: string, cycleStartDay = 1) => {
   const [y, m] = yyyymm.split("-").map(Number);
-  const start = new Date(Date.UTC(y, m - 1, 1));
-  const end = new Date(Date.UTC(y, m, 0));
-  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10), days: end.getUTCDate() };
+  const d = Math.min(28, Math.max(1, cycleStartDay));
+  // Period "yyyy-mm" represents the cycle that ENDS within that month.
+  // start = day d of (month - 1) when d > 1, else day 1 of month.
+  const start = d === 1
+    ? new Date(Date.UTC(y, m - 1, 1))
+    : new Date(Date.UTC(y, m - 2, d));
+  const end = d === 1
+    ? new Date(Date.UTC(y, m, 0))
+    : new Date(Date.UTC(y, m - 1, d - 1));
+  const days = Math.round((end.getTime() - start.getTime()) / 86400000) + 1;
+  return { start: start.toISOString().slice(0, 10), end: end.toISOString().slice(0, 10), days };
 };
 
 function StatCard({ label, value, icon: Icon, tint, color }: { label: string; value: string | number; icon: any; tint: string; color: string }) {
