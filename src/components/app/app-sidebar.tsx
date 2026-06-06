@@ -14,6 +14,7 @@ import {
   UserCog,
   Boxes,
   History,
+  ShoppingBag,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ export function AppSidebar() {
       label: t("nav.operations"),
       items: [
         { url: "/sales", icon: Receipt, title: t("nav.sales") },
+        { url: "/purchases", icon: ShoppingBag, title: t("purchases.title") },
         { url: "/inventory", icon: Boxes, title: t("nav.inventory") },
         { url: "/movements", icon: History, title: t("movements.title") },
       ],
