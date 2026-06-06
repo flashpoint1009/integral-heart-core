@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Search, Sliders } from "lucide-react";
 import { toast } from "sonner";
+import { ExcelImportButton } from "@/components/app/excel-import";
 
 export const Route = createFileRoute("/_authenticated/inventory")({
   head: () => ({ meta: [{ title: "Inventory — ERP" }] }),
@@ -33,6 +34,8 @@ type Inv = { id: string; product_id: string; warehouse_id: string; quantity: num
 function Page() {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { hasRole } = useAuth();
+  const canImport = hasRole("admin") || hasRole("manager") || hasRole("warehouse") || hasRole("accountant");
   const qc = useQueryClient();
   const [whFilter, setWhFilter] = useState<string>("all");
   const [query, setQuery] = useState("");
@@ -130,7 +133,46 @@ function Page() {
 
   return (
     <div className="p-6">
-      <PageHeader title={t("inventory.title")} />
+      <PageHeader title={t("inventory.title")} actions={canImport ? (
+        <ExcelImportButton
+          label="استيراد مخزون"
+          title="استيراد مخزون من Excel"
+          description="حدّد SKU للمنتج واسم المخزن والكمية. يتم استبدال الكمية الحالية."
+          templateFileName="inventory-template.xlsx"
+          columns={[
+            { key: "sku", label: "SKU", required: true, example: "SKU-001" },
+            { key: "warehouse", label: "المخزن", required: true, example: "المخزن الرئيسي" },
+            { key: "quantity", label: "الكمية", required: true, example: "100" },
+          ]}
+          importRow={async (r) => {
+            const sku = String(r.sku ?? "").trim();
+            const whName = String(r.warehouse ?? "").trim();
+            const qty = Number(r.quantity);
+            if (!sku) throw new Error("SKU مطلوب");
+            if (!whName) throw new Error("اسم المخزن مطلوب");
+            if (Number.isNaN(qty) || qty < 0) throw new Error("كمية غير صحيحة");
+            const p = products.find((x) => (x.sku ?? "").trim().toLowerCase() === sku.toLowerCase());
+            if (!p) throw new Error(`لا يوجد منتج بـ SKU=${sku}`);
+            const w = warehouses.find((x) => x.name.trim().toLowerCase() === whName.toLowerCase());
+            if (!w) throw new Error(`لا يوجد مخزن باسم ${whName}`);
+            const current = qtyMap.get(`${p.id}:${w.id}`) ?? 0;
+            const { error: upErr } = await supabase.from("inventory").upsert(
+              { product_id: p.id, warehouse_id: w.id, quantity: qty },
+              { onConflict: "product_id,warehouse_id" },
+            );
+            if (upErr) throw new Error(upErr.message);
+            const diff = qty - current;
+            if (diff !== 0) {
+              await supabase.from("stock_movements").insert({
+                product_id: p.id, warehouse_id: w.id,
+                movement_type: "adjustment", quantity: diff,
+                notes: "Excel import", created_by: user?.id ?? null,
+              });
+            }
+          }}
+          onDone={() => qc.invalidateQueries({ queryKey: ["inventory"] })}
+        />
+      ) : undefined} />
 
       <div className="mb-4 flex flex-wrap gap-2 items-center">
         <div className="relative max-w-xs flex-1">
