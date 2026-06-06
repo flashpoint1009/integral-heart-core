@@ -20,30 +20,42 @@ interface Stats {
   lowStock: number;
 }
 
+type RecentInvoice = { id: string; invoice_number: string; total: number; paid: number; status: string; invoice_date: string; customers: { name: string } | null };
+type LowProduct = { id: string; name_ar: string; name_en: string | null; min_stock: number; inventory: Array<{ quantity: number }> };
+
 function Dashboard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
+  const [recent, setRecent] = useState<RecentInvoice[]>([]);
+  const [lowProducts, setLowProducts] = useState<LowProduct[]>([]);
 
   useEffect(() => {
     const load = async () => {
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const month = new Date(); month.setDate(1); month.setHours(0, 0, 0, 0);
 
-      const [tSales, mSales, prods, custs] = await Promise.all([
+      const [tSales, mSales, prods, custs, invList, lowList] = await Promise.all([
         supabase.from("sales_invoices").select("total").gte("invoice_date", today.toISOString()),
         supabase.from("sales_invoices").select("total").gte("invoice_date", month.toISOString()),
         supabase.from("products").select("id", { count: "exact", head: true }),
         supabase.from("customers").select("id", { count: "exact", head: true }),
+        supabase.from("sales_invoices").select("id, invoice_number, total, paid, status, invoice_date, customers(name)").order("invoice_date", { ascending: false }).limit(5),
+        supabase.from("products").select("id, name_ar, name_en, min_stock, inventory(quantity)").gt("min_stock", 0),
       ]);
+
+      const lows = ((lowList.data ?? []) as unknown as LowProduct[])
+        .filter((p) => (p.inventory ?? []).reduce((s, i) => s + Number(i.quantity || 0), 0) <= Number(p.min_stock || 0));
 
       setStats({
         todaySales: (tSales.data ?? []).reduce((s, r) => s + Number(r.total || 0), 0),
         monthSales: (mSales.data ?? []).reduce((s, r) => s + Number(r.total || 0), 0),
         products: prods.count ?? 0,
         customers: custs.count ?? 0,
-        lowStock: 0,
+        lowStock: lows.length,
       });
+      setRecent((invList.data ?? []) as unknown as RecentInvoice[]);
+      setLowProducts(lows.slice(0, 5));
     };
     load();
   }, []);
@@ -84,7 +96,21 @@ function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground py-8 text-center">{t("dashboard.noData")}</p>
+            {lowProducts.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">{t("dashboard.noData")}</p>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                {lowProducts.map((p) => {
+                  const qty = (p.inventory ?? []).reduce((s, i) => s + Number(i.quantity || 0), 0);
+                  return (
+                    <li key={p.id} className="flex justify-between items-center border-b pb-1">
+                      <span className="font-medium">{p.name_ar}</span>
+                      <span className="text-warning tabular-nums">{qty} / {p.min_stock}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -92,7 +118,21 @@ function Dashboard() {
             <CardTitle className="text-base">{t("dashboard.recentInvoices")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground py-8 text-center">{t("dashboard.noData")}</p>
+            {recent.length === 0 ? (
+              <p className="text-sm text-muted-foreground py-8 text-center">{t("dashboard.noData")}</p>
+            ) : (
+              <ul className="space-y-2 text-sm">
+                {recent.map((inv) => (
+                  <li key={inv.id} className="flex justify-between items-center border-b pb-1">
+                    <div>
+                      <div className="font-mono text-xs">{inv.invoice_number}</div>
+                      <div className="text-xs text-muted-foreground">{inv.customers?.name ?? t("sales.walkin")}</div>
+                    </div>
+                    <span className="font-medium tabular-nums">{fmt(Number(inv.total))}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardContent>
         </Card>
       </div>
