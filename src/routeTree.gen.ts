@@ -42,6 +42,7 @@ import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authent
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
 import { Route as AuthenticatedDeveloperTenantsRouteImport } from './routes/_authenticated/developer.tenants'
 import { Route as AuthenticatedDeveloperModulesRouteImport } from './routes/_authenticated/developer.modules'
+import { Route as AuthenticatedDashboardRepsRouteImport } from './routes/_authenticated/dashboard.reps'
 import { Route as AuthenticatedDashboardProfitabilityRouteImport } from './routes/_authenticated/dashboard.profitability'
 import { Route as AuthenticatedDashboardForecastRouteImport } from './routes/_authenticated/dashboard.forecast'
 import { Route as AuthenticatedDashboardExecutiveRouteImport } from './routes/_authenticated/dashboard.executive'
@@ -220,6 +221,12 @@ const AuthenticatedDeveloperModulesRoute =
     path: '/modules',
     getParentRoute: () => AuthenticatedDeveloperRoute,
   } as any)
+const AuthenticatedDashboardRepsRoute =
+  AuthenticatedDashboardRepsRouteImport.update({
+    id: '/dashboard/reps',
+    path: '/dashboard/reps',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardProfitabilityRoute =
   AuthenticatedDashboardProfitabilityRouteImport.update({
     id: '/dashboard/profitability',
@@ -269,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -304,6 +312,7 @@ export interface FileRoutesByTo {
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -344,6 +353,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/_authenticated/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/_authenticated/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
+  '/_authenticated/dashboard/reps': typeof AuthenticatedDashboardRepsRoute
   '/_authenticated/developer/modules': typeof AuthenticatedDeveloperModulesRoute
   '/_authenticated/developer/tenants': typeof AuthenticatedDeveloperTenantsRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/dashboard/executive'
     | '/dashboard/forecast'
     | '/dashboard/profitability'
+    | '/dashboard/reps'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -419,6 +430,7 @@ export interface FileRouteTypes {
     | '/dashboard/executive'
     | '/dashboard/forecast'
     | '/dashboard/profitability'
+    | '/dashboard/reps'
     | '/developer/modules'
     | '/developer/tenants'
     | '/rep/attendance'
@@ -458,6 +470,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/executive'
     | '/_authenticated/dashboard/forecast'
     | '/_authenticated/dashboard/profitability'
+    | '/_authenticated/dashboard/reps'
     | '/_authenticated/developer/modules'
     | '/_authenticated/developer/tenants'
     | '/_authenticated/rep/attendance'
@@ -711,6 +724,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDeveloperModulesRouteImport
       parentRoute: typeof AuthenticatedDeveloperRoute
     }
+    '/_authenticated/dashboard/reps': {
+      id: '/_authenticated/dashboard/reps'
+      path: '/dashboard/reps'
+      fullPath: '/dashboard/reps'
+      preLoaderRoute: typeof AuthenticatedDashboardRepsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/profitability': {
       id: '/_authenticated/dashboard/profitability'
       path: '/dashboard/profitability'
@@ -826,6 +846,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardExecutiveRoute: typeof AuthenticatedDashboardExecutiveRoute
   AuthenticatedDashboardForecastRoute: typeof AuthenticatedDashboardForecastRoute
   AuthenticatedDashboardProfitabilityRoute: typeof AuthenticatedDashboardProfitabilityRoute
+  AuthenticatedDashboardRepsRoute: typeof AuthenticatedDashboardRepsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -852,6 +873,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardForecastRoute: AuthenticatedDashboardForecastRoute,
   AuthenticatedDashboardProfitabilityRoute:
     AuthenticatedDashboardProfitabilityRoute,
+  AuthenticatedDashboardRepsRoute: AuthenticatedDashboardRepsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
