@@ -1723,6 +1723,10 @@ export type Database = {
         | "accountant"
         | "sales_rep"
         | "supervisor"
+        | "developer"
+        | "sales_manager"
+        | "warehouse"
+        | "hr"
       invoice_status: "draft" | "confirmed" | "paid" | "partial" | "cancelled"
       movement_type: "purchase" | "sale" | "transfer" | "adjustment" | "return"
       payment_kind: "cash" | "card" | "bank" | "credit" | "other"
@@ -1860,6 +1864,10 @@ export const Constants = {
         "accountant",
         "sales_rep",
         "supervisor",
+        "developer",
+        "sales_manager",
+        "warehouse",
+        "hr",
       ],
       invoice_status: ["draft", "confirmed", "paid", "partial", "cancelled"],
       movement_type: ["purchase", "sale", "transfer", "adjustment", "return"],
