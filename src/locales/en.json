@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "ERP System",
+    "tagline": "Integrated business management"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "pos": "Point of Sale",
+    "products": "Products",
+    "categories": "Categories",
+    "inventory": "Inventory",
+    "warehouses": "Warehouses",
+    "sales": "Sales",
+    "customers": "Customers",
+    "suppliers": "Suppliers",
+    "reports": "Reports",
+    "settings": "Settings",
+    "users": "Users",
+    "main": "Main",
+    "operations": "Operations",
+    "data": "Data",
+    "system": "System"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "continueWithGoogle": "Continue with Google",
+    "or": "or",
+    "haveAccount": "Already have an account?",
+    "noAccount": "Don't have an account?",
+    "welcome": "Welcome",
+    "welcomeBack": "Welcome back",
+    "createAccountDesc": "Create a new account to get started",
+    "signInDesc": "Sign in to access your dashboard",
+    "firstUserAdmin": "The first user to sign up becomes Admin automatically"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "todaySales": "Today's Sales",
+    "monthSales": "This Month",
+    "totalProducts": "Total Products",
+    "totalCustomers": "Total Customers",
+    "lowStock": "Low Stock Items",
+    "recentInvoices": "Recent Invoices",
+    "noData": "No data yet — start by adding a product or invoice",
+    "welcomeUser": "Welcome, {{name}}"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "comingSoon": "Coming Soon"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "manager": "Manager",
+    "cashier": "Cashier",
+    "accountant": "Accountant"
+  }
+}

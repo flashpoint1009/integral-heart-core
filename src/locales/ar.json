@@ -1,0 +1,70 @@
+{
+  "app": {
+    "name": "نظام ERP",
+    "tagline": "إدارة متكاملة لنشاطك"
+  },
+  "nav": {
+    "dashboard": "لوحة التحكم",
+    "pos": "نقطة البيع",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "inventory": "المخزون",
+    "warehouses": "المخازن",
+    "sales": "المبيعات",
+    "customers": "العملاء",
+    "suppliers": "الموردين",
+    "reports": "التقارير",
+    "settings": "الإعدادات",
+    "users": "المستخدمين",
+    "main": "الرئيسية",
+    "operations": "العمليات",
+    "data": "البيانات",
+    "system": "النظام"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "signOut": "تسجيل الخروج",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "continueWithGoogle": "متابعة مع جوجل",
+    "or": "أو",
+    "haveAccount": "عندك حساب بالفعل؟",
+    "noAccount": "مالكش حساب؟",
+    "welcome": "أهلاً بيك",
+    "welcomeBack": "أهلاً بعودتك",
+    "createAccountDesc": "ابدأ بإنشاء حساب جديد للنظام",
+    "signInDesc": "سجل دخولك للوصول للنظام",
+    "firstUserAdmin": "أول مستخدم يسجل بيبقى Admin تلقائياً"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "todaySales": "مبيعات اليوم",
+    "monthSales": "مبيعات الشهر",
+    "totalProducts": "إجمالي المنتجات",
+    "totalCustomers": "إجمالي العملاء",
+    "lowStock": "منتجات على وشك النفاد",
+    "recentInvoices": "أحدث الفواتير",
+    "noData": "لا توجد بيانات بعد — ابدأ بإضافة منتج أو فاتورة",
+    "welcomeUser": "أهلاً، {{name}}"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "language": "اللغة",
+    "darkMode": "الوضع الليلي",
+    "comingSoon": "قريباً"
+  },
+  "roles": {
+    "admin": "مدير النظام",
+    "manager": "مدير",
+    "cashier": "كاشير",
+    "accountant": "محاسب"
+  }
+}
