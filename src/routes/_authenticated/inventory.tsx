@@ -134,8 +134,8 @@ function Page() {
 
       <div className="mb-4 flex flex-wrap gap-2 items-center">
         <div className="relative max-w-xs flex-1">
-          <Search className="absolute start-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input className="ps-8" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input className="ps-9 rounded-full shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
         <Select value={whFilter} onValueChange={setWhFilter}>
           <SelectTrigger className="w-[200px]"><SelectValue placeholder={t("inventory.filterWarehouse")} /></SelectTrigger>
@@ -170,8 +170,8 @@ function Page() {
             ) : filteredProducts.map((p) => {
               const min = Number(p.min_stock ?? 0);
               return (
-                <TableRow key={p.id}>
-                  <TableCell className="font-medium">{productName(p)}</TableCell>
+                <TableRow key={p.id} className="hover:bg-muted/40">
+                  <TableCell className="font-semibold text-primary">{productName(p)}</TableCell>
                   <TableCell className="font-mono text-sm text-muted-foreground">{p.sku ?? "—"}</TableCell>
                   {shownWarehouses.map((w) => {
                     const q = qtyMap.get(`${p.id}:${w.id}`) ?? 0;
@@ -183,7 +183,7 @@ function Page() {
                           className="inline-flex items-center gap-1.5 hover:text-primary transition-colors group"
                         >
                           <span className="tabular-nums font-medium">{q}</span>
-                          {low && <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">{t("inventory.low")}</Badge>}
+                          {low && <Badge variant="destructive" className="h-5 px-1.5 text-[10px] rounded-full">{t("inventory.low")}</Badge>}
                           <Sliders className="h-3 w-3 opacity-0 group-hover:opacity-100" />
                         </button>
                       </TableCell>
