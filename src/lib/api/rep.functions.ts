@@ -9,8 +9,12 @@ async function getEmployeeId(supabase: any, userId: string): Promise<string> {
     .eq("user_id", userId)
     .maybeSingle();
   if (error) throw new Error(error.message);
-  if (!data) throw new Error("No employee record linked to this user");
-  return data.id;
+  if (data) return data.id;
+  // Auto-provision an employee record from the user's profile
+  const { data: emp, error: rpcErr } = await supabase.rpc("ensure_employee_for_user", { _user_id: userId });
+  if (rpcErr) throw new Error(rpcErr.message);
+  if (!emp) throw new Error("Failed to provision employee record");
+  return emp as string;
 }
 
 export const repCheckIn = createServerFn({ method: "POST" })
