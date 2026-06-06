@@ -72,6 +72,9 @@ export function AppSidebar() {
           { url: "/developer/tenants", icon: Building2, title: "الشركات" } as Item,
         ] : []),
         { url: "/developer/modules", icon: Layers, title: "المكونات" } as Item,
+        ...(isDeveloper ? [
+          { url: "/developer/audit", icon: History, title: "سجل العمليات" } as Item,
+        ] : []),
       ],
     }] : []),
     ...(showSupervisor ? [{
