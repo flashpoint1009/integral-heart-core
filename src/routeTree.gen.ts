@@ -9,13 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShopRouteImport } from './routes/shop'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ShopCheckoutRouteImport } from './routes/shop.checkout'
 import { Route as AuthenticatedWarehousesRouteImport } from './routes/_authenticated/warehouses'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedSuppliersRouteImport } from './routes/_authenticated/suppliers'
 import { Route as AuthenticatedSupervisorRouteImport } from './routes/_authenticated/supervisor'
+import { Route as AuthenticatedSiteBuilderRouteImport } from './routes/_authenticated/site-builder'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSalesRouteImport } from './routes/_authenticated/sales'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -23,6 +27,7 @@ import { Route as AuthenticatedPurchasesRouteImport } from './routes/_authentica
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedPosRouteImport } from './routes/_authenticated/pos'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
+import { Route as AuthenticatedOnlineOrdersRouteImport } from './routes/_authenticated/online-orders'
 import { Route as AuthenticatedMovementsRouteImport } from './routes/_authenticated/movements'
 import { Route as AuthenticatedInventoryRouteImport } from './routes/_authenticated/inventory'
 import { Route as AuthenticatedHrRouteImport } from './routes/_authenticated/hr'
@@ -51,6 +56,11 @@ import { Route as AuthenticatedDashboardForecastRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardExecutiveRouteImport } from './routes/_authenticated/dashboard.executive'
 import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
+const ShopRoute = ShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -60,10 +70,20 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ShopRoute,
+} as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const ShopCheckoutRoute = ShopCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => ShopRoute,
 } as any)
 const AuthenticatedWarehousesRoute = AuthenticatedWarehousesRouteImport.update({
   id: '/warehouses',
@@ -85,6 +105,12 @@ const AuthenticatedSupervisorRoute = AuthenticatedSupervisorRouteImport.update({
   path: '/supervisor',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSiteBuilderRoute =
+  AuthenticatedSiteBuilderRouteImport.update({
+    id: '/site-builder',
+    path: '/site-builder',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -119,6 +145,12 @@ const AuthenticatedPermissionsRoute =
   AuthenticatedPermissionsRouteImport.update({
     id: '/permissions',
     path: '/permissions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedOnlineOrdersRoute =
+  AuthenticatedOnlineOrdersRouteImport.update({
+    id: '/online-orders',
+    path: '/online-orders',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMovementsRoute = AuthenticatedMovementsRouteImport.update({
@@ -276,6 +308,7 @@ const AuthenticatedRepVisitCustomerIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/auth': typeof AuthRoute
+  '/shop': typeof ShopRouteWithChildren
   '/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/categories': typeof AuthenticatedCategoriesRoute
   '/customers': typeof AuthenticatedCustomersRoute
@@ -284,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/hr': typeof AuthenticatedHrRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/movements': typeof AuthenticatedMovementsRoute
+  '/online-orders': typeof AuthenticatedOnlineOrdersRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/pos': typeof AuthenticatedPosRoute
   '/products': typeof AuthenticatedProductsRoute
@@ -291,10 +325,13 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/sales': typeof AuthenticatedSalesRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/site-builder': typeof AuthenticatedSiteBuilderRoute
   '/supervisor': typeof AuthenticatedSupervisorRouteWithChildren
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
+  '/shop/': typeof ShopIndexRoute
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
@@ -323,6 +360,7 @@ export interface FileRoutesByTo {
   '/hr': typeof AuthenticatedHrRoute
   '/inventory': typeof AuthenticatedInventoryRoute
   '/movements': typeof AuthenticatedMovementsRoute
+  '/online-orders': typeof AuthenticatedOnlineOrdersRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/pos': typeof AuthenticatedPosRoute
   '/products': typeof AuthenticatedProductsRoute
@@ -330,10 +368,13 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/sales': typeof AuthenticatedSalesRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/site-builder': typeof AuthenticatedSiteBuilderRoute
   '/suppliers': typeof AuthenticatedSuppliersRoute
   '/users': typeof AuthenticatedUsersRoute
   '/warehouses': typeof AuthenticatedWarehousesRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
   '/': typeof AuthenticatedIndexRoute
+  '/shop': typeof ShopIndexRoute
   '/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
@@ -358,6 +399,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/shop': typeof ShopRouteWithChildren
   '/_authenticated/rep': typeof AuthenticatedRepRouteRouteWithChildren
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/customers': typeof AuthenticatedCustomersRoute
@@ -366,6 +408,7 @@ export interface FileRoutesById {
   '/_authenticated/hr': typeof AuthenticatedHrRoute
   '/_authenticated/inventory': typeof AuthenticatedInventoryRoute
   '/_authenticated/movements': typeof AuthenticatedMovementsRoute
+  '/_authenticated/online-orders': typeof AuthenticatedOnlineOrdersRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
   '/_authenticated/pos': typeof AuthenticatedPosRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
@@ -373,11 +416,14 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/sales': typeof AuthenticatedSalesRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/site-builder': typeof AuthenticatedSiteBuilderRoute
   '/_authenticated/supervisor': typeof AuthenticatedSupervisorRouteWithChildren
   '/_authenticated/suppliers': typeof AuthenticatedSuppliersRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/warehouses': typeof AuthenticatedWarehousesRoute
+  '/shop/checkout': typeof ShopCheckoutRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/shop/': typeof ShopIndexRoute
   '/_authenticated/dashboard/executive': typeof AuthenticatedDashboardExecutiveRoute
   '/_authenticated/dashboard/forecast': typeof AuthenticatedDashboardForecastRoute
   '/_authenticated/dashboard/profitability': typeof AuthenticatedDashboardProfitabilityRoute
@@ -403,6 +449,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/shop'
     | '/rep'
     | '/categories'
     | '/customers'
@@ -411,6 +458,7 @@ export interface FileRouteTypes {
     | '/hr'
     | '/inventory'
     | '/movements'
+    | '/online-orders'
     | '/permissions'
     | '/pos'
     | '/products'
@@ -418,10 +466,13 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sales'
     | '/settings'
+    | '/site-builder'
     | '/supervisor'
     | '/suppliers'
     | '/users'
     | '/warehouses'
+    | '/shop/checkout'
+    | '/shop/'
     | '/dashboard/executive'
     | '/dashboard/forecast'
     | '/dashboard/profitability'
@@ -450,6 +501,7 @@ export interface FileRouteTypes {
     | '/hr'
     | '/inventory'
     | '/movements'
+    | '/online-orders'
     | '/permissions'
     | '/pos'
     | '/products'
@@ -457,10 +509,13 @@ export interface FileRouteTypes {
     | '/reports'
     | '/sales'
     | '/settings'
+    | '/site-builder'
     | '/suppliers'
     | '/users'
     | '/warehouses'
+    | '/shop/checkout'
     | '/'
+    | '/shop'
     | '/dashboard/executive'
     | '/dashboard/forecast'
     | '/dashboard/profitability'
@@ -484,6 +539,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/auth'
+    | '/shop'
     | '/_authenticated/rep'
     | '/_authenticated/categories'
     | '/_authenticated/customers'
@@ -492,6 +548,7 @@ export interface FileRouteTypes {
     | '/_authenticated/hr'
     | '/_authenticated/inventory'
     | '/_authenticated/movements'
+    | '/_authenticated/online-orders'
     | '/_authenticated/permissions'
     | '/_authenticated/pos'
     | '/_authenticated/products'
@@ -499,11 +556,14 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/sales'
     | '/_authenticated/settings'
+    | '/_authenticated/site-builder'
     | '/_authenticated/supervisor'
     | '/_authenticated/suppliers'
     | '/_authenticated/users'
     | '/_authenticated/warehouses'
+    | '/shop/checkout'
     | '/_authenticated/'
+    | '/shop/'
     | '/_authenticated/dashboard/executive'
     | '/_authenticated/dashboard/forecast'
     | '/_authenticated/dashboard/profitability'
@@ -528,10 +588,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ShopRoute: typeof ShopRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/shop': {
+      id: '/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -546,12 +614,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/': {
+      id: '/shop/'
+      path: '/'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof ShopRoute
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/shop/checkout': {
+      id: '/shop/checkout'
+      path: '/checkout'
+      fullPath: '/shop/checkout'
+      preLoaderRoute: typeof ShopCheckoutRouteImport
+      parentRoute: typeof ShopRoute
     }
     '/_authenticated/warehouses': {
       id: '/_authenticated/warehouses'
@@ -579,6 +661,13 @@ declare module '@tanstack/react-router' {
       path: '/supervisor'
       fullPath: '/supervisor'
       preLoaderRoute: typeof AuthenticatedSupervisorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/site-builder': {
+      id: '/_authenticated/site-builder'
+      path: '/site-builder'
+      fullPath: '/site-builder'
+      preLoaderRoute: typeof AuthenticatedSiteBuilderRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -628,6 +717,13 @@ declare module '@tanstack/react-router' {
       path: '/permissions'
       fullPath: '/permissions'
       preLoaderRoute: typeof AuthenticatedPermissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/online-orders': {
+      id: '/_authenticated/online-orders'
+      path: '/online-orders'
+      fullPath: '/online-orders'
+      preLoaderRoute: typeof AuthenticatedOnlineOrdersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/movements': {
@@ -896,6 +992,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHrRoute: typeof AuthenticatedHrRoute
   AuthenticatedInventoryRoute: typeof AuthenticatedInventoryRoute
   AuthenticatedMovementsRoute: typeof AuthenticatedMovementsRoute
+  AuthenticatedOnlineOrdersRoute: typeof AuthenticatedOnlineOrdersRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
   AuthenticatedPosRoute: typeof AuthenticatedPosRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
@@ -903,6 +1000,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedSalesRoute: typeof AuthenticatedSalesRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSiteBuilderRoute: typeof AuthenticatedSiteBuilderRoute
   AuthenticatedSupervisorRoute: typeof AuthenticatedSupervisorRouteWithChildren
   AuthenticatedSuppliersRoute: typeof AuthenticatedSuppliersRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
@@ -923,6 +1021,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHrRoute: AuthenticatedHrRoute,
   AuthenticatedInventoryRoute: AuthenticatedInventoryRoute,
   AuthenticatedMovementsRoute: AuthenticatedMovementsRoute,
+  AuthenticatedOnlineOrdersRoute: AuthenticatedOnlineOrdersRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
   AuthenticatedPosRoute: AuthenticatedPosRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
@@ -930,6 +1029,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedSalesRoute: AuthenticatedSalesRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSiteBuilderRoute: AuthenticatedSiteBuilderRoute,
   AuthenticatedSupervisorRoute: AuthenticatedSupervisorRouteWithChildren,
   AuthenticatedSuppliersRoute: AuthenticatedSuppliersRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
@@ -945,9 +1045,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ShopRouteChildren {
+  ShopCheckoutRoute: typeof ShopCheckoutRoute
+  ShopIndexRoute: typeof ShopIndexRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopCheckoutRoute: ShopCheckoutRoute,
+  ShopIndexRoute: ShopIndexRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ShopRoute: ShopRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
