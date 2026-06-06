@@ -19,7 +19,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Package, Tag, CheckCircle2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/products")({
@@ -138,9 +139,29 @@ function Page() {
     <div className="p-6">
       <PageHeader title={t("products.title")} actions={<Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("products.add")}</Button>} />
 
+      <div className="grid gap-4 sm:grid-cols-3 mb-4">
+        {[
+          { label: t("products.title"), value: rows.length, icon: Package, tint: "from-primary/10 to-primary/0", color: "text-primary" },
+          { label: t("common.active"), value: rows.filter((r) => r.is_active).length, icon: CheckCircle2, tint: "from-emerald-500/10 to-emerald-500/0", color: "text-emerald-600" },
+          { label: t("products.category"), value: cats.length, icon: Tag, tint: "from-violet-500/10 to-violet-500/0", color: "text-violet-600" },
+        ].map((c) => (
+          <Card key={c.label} className={`bg-gradient-to-br ${c.tint} border-border/60`}>
+            <CardContent className="pt-5 flex items-center justify-between">
+              <div>
+                <div className="text-xs text-muted-foreground">{c.label}</div>
+                <div className="text-2xl font-bold tabular-nums mt-1">{c.value}</div>
+              </div>
+              <div className={`h-10 w-10 rounded-xl bg-background/60 grid place-items-center ${c.color}`}>
+                <c.icon className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       <div className="mb-4 relative max-w-sm">
-        <Search className="absolute start-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input className="ps-8" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input className="ps-9 rounded-full shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
       <div className="rounded-md border bg-card overflow-x-auto">
@@ -162,8 +183,8 @@ function Page() {
             ) : filtered.length === 0 ? (
               <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
             ) : filtered.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-medium">
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">
                   <div>{i18n.language === "en" && r.name_en ? r.name_en : r.name_ar}</div>
                   {r.barcode && <div className="text-xs text-muted-foreground font-mono">{r.barcode}</div>}
                 </TableCell>
@@ -171,7 +192,7 @@ function Page() {
                 <TableCell className="text-muted-foreground">{catLabel(r.category_id)}</TableCell>
                 <TableCell className="text-end tabular-nums">{Number(r.sale_price).toFixed(2)}</TableCell>
                 <TableCell className="text-end tabular-nums text-muted-foreground">{Number(r.cost_price).toFixed(2)}</TableCell>
-                <TableCell>{r.is_active ? <Badge>{t("common.active")}</Badge> : <Badge variant="outline">{t("common.inactive")}</Badge>}</TableCell>
+                <TableCell>{r.is_active ? <Badge className="rounded-full">{t("common.active")}</Badge> : <Badge variant="outline" className="rounded-full">{t("common.inactive")}</Badge>}</TableCell>
                 <TableCell className="text-end">
                   <div className="flex gap-1 justify-end">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
