@@ -1,110 +1,90 @@
 
-## النظرة العامة
+## نظرة عامة
 
-نظام ERP معياري (Modular) قابل للتخصيص الكامل من الواجهة — المطور/الأدمن يقدر يضيف ويعدل ويحذف أي بيانات (منتجات، فئات، عملاء، مخازن، طرق دفع، أدوار…) من غير ما يلمس الكود. النسخة الأولى تركّز على ثلاث ركائز: المخزون، المبيعات/الفواتير، وشاشة الكاشير (POS).
+نضيف **دور جديد "مندوب" (sales_rep)** + واجهة موبايل خفيفة على نفس المشروع تحت `/rep/*` (PWA installable)، ولوحة إشراف للمدير تحت `/supervisor`. كل البيع من المخزن المركزي (online فقط)، والعملاء الجدد يتسجلوا فوراً بدون اعتماد.
 
-## الباك-إند (Lovable Cloud)
+## قاعدة البيانات (Migration واحد)
 
-نفعّل Lovable Cloud ونبني الجداول دي مع RLS كامل:
+أضيف الأعمدة/الجداول:
 
-- `profiles` — بيانات المستخدم (اسم، أفاتار، لغة مفضلة)
-- `user_roles` — جدول منفصل للأدوار (`admin`, `manager`, `cashier`, `accountant`) + دالة `has_role()` آمنة
-- `categories` — فئات المنتجات (هرمية: parent_id)
-- `products` — كود، باركود، اسم AR/EN، سعر بيع، سعر تكلفة، ضريبة، وحدة، صورة، فئة
-- `warehouses` — مخازن متعددة
-- `inventory` — رصيد كل منتج في كل مخزن
-- `stock_movements` — حركات (وارد/صادر/تحويل/تسوية) — مصدر الحقيقة للرصيد
-- `customers` — عملاء (اسم، تليفون، رصيد، حد ائتمان)
-- `suppliers` — موردين
-- `sales_invoices` + `sales_invoice_items` — فواتير المبيعات
-- `payments` — مدفوعات الفواتير (كاش/شبكة/آجل)
-- `payment_methods` — قابلة للتخصيص
-- `settings` — إعدادات الشركة (اسم، عملة، شعار، نسبة ضريبة، لغة افتراضية)
-- `audit_log` — سجل تغييرات
+- **employees**: عمود `user_id (uuid)` لربط الموظف بحساب auth + `assigned_supervisor_id`
+- **customers**: عمود `assigned_rep_id` (الراجع للموظف) + `lat`, `lng`, `address_notes`
+- **app_role enum**: إضافة قيمة `'sales_rep'` و `'supervisor'`
+- **rep_check_ins** جدول جديد: `employee_id, check_in_at, check_out_at, lat, lng, address`
+- **rep_visits** جدول جديد: `employee_id, customer_id, visited_at, lat, lng, duration_sec, notes, outcome (sold/no_sale/not_found), invoice_id (nullable)`
+- **rep_routes** جدول جديد: `employee_id, route_date, customer_id, sequence, status (pending/done/skipped)` — المشرف يخطط، المندوب ينفذ
+- **sales_invoices**: عمود `rep_id` (المندوب اللي عمل الفاتورة) + `visit_id`
 
-كل الكتابة/القراءة من خلال `createServerFn` مع `requireSupabaseAuth` + فحص الدور المناسب.
+RLS:
+- المندوب يشوف عملاءه + خط سيره + فواتيره + حضوره فقط
+- المشرف يشوف كل مندوبيه
+- الأدمن يشوف الكل
 
-## المصادقة والأدوار
+## واجهة المندوب `/rep/*`
 
-- تسجيل دخول بالإيميل/كلمة سر + Google OAuth
-- أربع أدوار: **Admin** (كل شيء + إدارة مستخدمين)، **Manager** (تقارير + إدارة عمليات)، **Cashier** (شاشة الكاشير فقط)، **Accountant** (الفواتير والمدفوعات قراءة/كتابة)
-- صفحة `/auth` عامة + `_authenticated` layout للباقي
-- شاشة Settings → Users & Roles لإدارة الصلاحيات من الواجهة
-
-## الشاشات (v1)
+تطبيق موبايل-أولاً (responsive)، مع manifest + أيقونات للتثبيت على الموبايل:
 
 ```text
-/auth                       تسجيل دخول/تسجيل
-/                           Dashboard — KPIs (مبيعات اليوم/الشهر، أكثر منتج، أقل مخزون)
-/pos                        شاشة كاشير full-screen (بحث بالباركود، سلة، دفع، طباعة)
-/products                   قائمة + CRUD + استيراد/تصدير CSV
-/products/categories        إدارة الفئات
-/inventory                  أرصدة المخازن + حركات + تحويل + تسوية + جرد
-/sales                      فواتير المبيعات (قائمة + فلترة + تفاصيل)
-/sales/new                  إنشاء فاتورة يدوية
-/customers                  CRUD عملاء + كشف حساب
-/reports                    تقارير: مبيعات يومية/شهرية، أرباح، مخزون راكد
-/settings                   إعدادات الشركة، طرق الدفع، الضريبة، اللغة
-/settings/users             إدارة المستخدمين والأدوار
+/rep                    → Dashboard (حضور اليوم، عدد الزيارات، مبيعات اليوم)
+/rep/attendance         → زر تسجيل دخول/خروج (يلتقط GPS)
+/rep/route              → خط سير اليوم (قائمة عملاء بالترتيب + خريطة)
+/rep/customers          → كل عملاء المندوب + بحث + إضافة جديد
+/rep/customers/$id      → كارت العميل + زر "بدء زيارة" + تاريخ المعاملات
+/rep/visit/$id          → شاشة زيارة نشطة: بيع فوري | تحصيل | ملاحظة | إنهاء
+/rep/sale               → POS مبسط (منتجات + كمية + سعر + حفظ → فاتورة)
+/rep/invoice/$id        → معاينة + طباعة
 ```
 
-كل قائمة فيها: بحث + فلترة + ترتيب + Pagination + Bulk actions + Export CSV.
+ملامح مهمة:
+- زر "بدء يوم" يفتح GPS ويسجل check-in
+- كل زيارة تطلب الـ GPS وتقفل الموقع
+- بيع من شاشة الزيارة → فاتورة مرتبطة بالعميل والمندوب والزيارة تلقائياً
+- طباعة A4 بتعمل `window.print()` (موجودة فعلاً) + هيدر مختصر مناسب للورق الحراري
 
-## التخصيص الكامل (المطلب المهم)
+## لوحة المشرف `/supervisor` (تظهر في القائمة لو دوره supervisor/admin)
 
-- كل entity (منتج، فئة، عميل، مخزن، طريقة دفع، دور) عنده شاشة CRUD كاملة في الواجهة — مفيش بيانات hard-coded
-- جدول `settings` JSON-flexible عشان نضيف أي إعداد جديد من غير migration
-- نظام **Custom Fields** على المنتجات والعملاء (الأدمن يضيف حقول إضافية من Settings)
-- Theming من الإعدادات (لون primary + شعار)
+```text
+/supervisor              → Dashboard (مندوبين نشطين الآن، مبيعات اليوم/مندوب)
+/supervisor/live         → خريطة حية بآخر موقع لكل مندوب
+/supervisor/routes       → تخطيط خطوط السير (سحب وإفلات عملاء على مندوب/يوم)
+/supervisor/reports      → تقارير: زيارات منفذة vs مخططة، مبيعات/مندوب، تحصيلات
+/supervisor/customers    → كل العملاء + إعادة تخصيص لمندوب
+```
 
-## اللغة (AR/EN + RTL/LTR)
+## تكامل مع النظام الحالي
 
-- مكتبة `i18next` + `react-i18next`
-- toggle في الـ navbar يخزّن التفضيل في `profiles.locale`
-- `dir="rtl"` ديناميكي على الـ `<html>`
-- كل النصوص في ملفات `locales/ar.json` و `locales/en.json`
+- **المخزون**: البيع من المخزن المركزي الافتراضي → الـ triggers الحالية تخصم تلقائياً
+- **القيود المحاسبية**: فواتير المندوب تمر بنفس `tg_sales_invoice_journal` → تسجل في اليومية تلقائياً
+- **الحضور**: `rep_check_ins` بتسجل تلقائياً في جدول `attendance` كـ "present" لما المندوب يعمل check-in
+- **HR**: المندوب موظف عادي بـ `user_id` مربوط — كل قواعد المرتبات والإجازات شغالة
 
-## الستاك التقني
+## PWA (تثبيت كأيقونة)
 
-- TanStack Start (موجود) + TanStack Query للـ data fetching
-- Shadcn Sidebar للـ layout الأساسي
-- `createServerFn` لكل عمليات الـ DB (مفيش queries مباشرة من المكونات)
-- Zod للـ validation على الكلاينت والسيرفر
-- `react-hook-form` للنماذج
-- `recharts` للتقارير
-- طباعة الفواتير: `react-to-print` + قالب HTML قابل للتخصيص
+- إضافة `public/manifest.webmanifest` بـ `display: standalone`
+- أيقونات (نولدها)
+- meta tags في `__root.tsx`
+- **بدون** service worker (لإن المستخدم اختار online فقط) — التثبيت كفاية للتجربة الموبايل
 
-## التصميم
+## التنفيذ على مراحل
 
-- ثيم احترافي data-dense (مش marketing): sidebar مظلل، محتوى نظيف، جداول واضحة
-- Design tokens في `src/styles.css` بصيغة `oklch` — primary أزرق هادي، accent أخضر للنجاح
-- خطوط: **Cairo** للعربي، **Inter** للإنجليزي
-- وضع ليلي افتراضي للكاشير (أقل إجهاد للعين)
+**المرحلة 1** (نبدأ بيها دلوقتي):
+1. Migration: الأدوار + الجداول الجديدة + RLS
+2. تحديث الـ topbar/sidebar لإخفاء العناصر اللي مش من حق المندوب
+3. صفحات `/rep/attendance` + `/rep/customers` + `/rep/sale` + `/rep/route`
+4. PWA manifest + أيقونات
 
-## خطة التنفيذ (مراحل)
+**المرحلة 2**:
+5. زيارات + GPS tracking + طباعة الفاتورة
+6. لوحة المشرف: live map + reports
+7. تخطيط خطوط السير (drag & drop)
 
-### المرحلة 1 — الأساس (هاعملها أول حاجة)
-1. تفعيل Lovable Cloud + إنشاء كل الـ tables + RLS + roles
-2. Auth (Email + Google) + صفحة `/auth` + `_authenticated` layout
-3. Layout أساسي بـ Sidebar + Topbar + Language toggle + i18n setup
-4. Dashboard بـ KPIs placeholder
+## ملاحظات تقنية
 
-### المرحلة 2 — المنتجات والمخزون
-5. شاشة Categories CRUD
-6. شاشة Products CRUD (مع رفع صور)
-7. شاشة Warehouses + Inventory + Stock movements
+- GPS عبر `navigator.geolocation` (متاح في PWA على الموبايل)
+- الخرائط: Leaflet + OpenStreetMap (مجاني، بدون API key)
+- الموبايل-أولاً: نستخدم Tailwind responsive + bottom navigation للـ /rep
+- لو احتجنا لاحقاً Capacitor لطباعة بلوتوث/خلفية → نفس الكود يتغلف في APK
 
-### المرحلة 3 — المبيعات والكاشير
-8. شاشة Customers CRUD
-9. شاشة Sales Invoices (قائمة + إنشاء يدوي + طباعة)
-10. شاشة POS (كاشير) كاملة
+---
 
-### المرحلة 4 — التقارير والإعدادات
-11. شاشة Reports
-12. شاشة Settings + Users & Roles
-
-## ملاحظة مهمة
-
-عشان أضمن الجودة، **هابدأ النهارده بالمرحلة 1 كاملة** (الأساس: Cloud + Auth + Layout + Dashboard فاضي). بعدها تقولي "كمّل" وأنا أنفّذ المرحلة 2، وهكذا. ده أحسن من إني أعمل كل حاجة في رسالة واحدة وتطلع نص شغّالة.
-
-موافق على الخطة دي؟ ولا عايز تعدّل حاجة (تشيل موديول، تضيف موديول زي المشتريات أو الموردين من البداية، تغيّر الأدوار…)؟
+**أبدأ بالمرحلة 1 دلوقتي؟**
