@@ -380,6 +380,8 @@ export type Database = {
       customers: {
         Row: {
           address: string | null
+          address_notes: string | null
+          assigned_rep_id: string | null
           balance: number
           created_at: string
           credit_limit: number | null
@@ -387,6 +389,8 @@ export type Database = {
           email: string | null
           id: string
           is_active: boolean
+          lat: number | null
+          lng: number | null
           name: string
           notes: string | null
           phone: string | null
@@ -395,6 +399,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          address_notes?: string | null
+          assigned_rep_id?: string | null
           balance?: number
           created_at?: string
           credit_limit?: number | null
@@ -402,6 +408,8 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean
+          lat?: number | null
+          lng?: number | null
           name: string
           notes?: string | null
           phone?: string | null
@@ -410,6 +418,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          address_notes?: string | null
+          assigned_rep_id?: string | null
           balance?: number
           created_at?: string
           credit_limit?: number | null
@@ -417,19 +427,30 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean
+          lat?: number | null
+          lng?: number | null
           name?: string
           notes?: string | null
           phone?: string | null
           tax_number?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "customers_assigned_rep_id_fkey"
+            columns: ["assigned_rep_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       employees: {
         Row: {
           address: string | null
           allowances: number
           annual_leave_balance: number
+          assigned_supervisor_id: string | null
           base_salary: number
           casual_leave_balance: number
           created_at: string
@@ -455,6 +476,7 @@ export type Database = {
           address?: string | null
           allowances?: number
           annual_leave_balance?: number
+          assigned_supervisor_id?: string | null
           base_salary?: number
           casual_leave_balance?: number
           created_at?: string
@@ -480,6 +502,7 @@ export type Database = {
           address?: string | null
           allowances?: number
           annual_leave_balance?: number
+          assigned_supervisor_id?: string | null
           base_salary?: number
           casual_leave_balance?: number
           created_at?: string
@@ -501,7 +524,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "employees_assigned_supervisor_id_fkey"
+            columns: ["assigned_supervisor_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       expense_categories: {
         Row: {
@@ -1096,6 +1127,165 @@ export type Database = {
         }
         Relationships: []
       }
+      rep_check_ins: {
+        Row: {
+          check_in_at: string
+          check_in_lat: number | null
+          check_in_lng: number | null
+          check_out_at: string | null
+          check_out_lat: number | null
+          check_out_lng: number | null
+          created_at: string
+          employee_id: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          employee_id: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          check_in_at?: string
+          check_in_lat?: number | null
+          check_in_lng?: number | null
+          check_out_at?: string | null
+          check_out_lat?: number | null
+          check_out_lng?: number | null
+          created_at?: string
+          employee_id?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rep_check_ins_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rep_routes: {
+        Row: {
+          created_at: string
+          customer_id: string
+          employee_id: string
+          id: string
+          notes: string | null
+          route_date: string
+          sequence: number
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          employee_id: string
+          id?: string
+          notes?: string | null
+          route_date: string
+          sequence?: number
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          employee_id?: string
+          id?: string
+          notes?: string | null
+          route_date?: string
+          sequence?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rep_routes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rep_routes_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rep_visits: {
+        Row: {
+          created_at: string
+          customer_id: string
+          employee_id: string
+          ended_at: string | null
+          id: string
+          invoice_id: string | null
+          lat: number | null
+          lng: number | null
+          notes: string | null
+          outcome: string
+          started_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          employee_id: string
+          ended_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          outcome?: string
+          started_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          employee_id?: string
+          ended_at?: string | null
+          id?: string
+          invoice_id?: string | null
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          outcome?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rep_visits_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rep_visits_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rep_visits_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "sales_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salary_advances: {
         Row: {
           amount: number
@@ -1208,11 +1398,13 @@ export type Database = {
           invoice_number: string
           notes: string | null
           paid: number
+          rep_id: string | null
           status: Database["public"]["Enums"]["invoice_status"]
           subtotal: number
           tax_total: number
           total: number
           updated_at: string
+          visit_id: string | null
           warehouse_id: string | null
         }
         Insert: {
@@ -1225,11 +1417,13 @@ export type Database = {
           invoice_number: string
           notes?: string | null
           paid?: number
+          rep_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_total?: number
           total?: number
           updated_at?: string
+          visit_id?: string | null
           warehouse_id?: string | null
         }
         Update: {
@@ -1242,11 +1436,13 @@ export type Database = {
           invoice_number?: string
           notes?: string | null
           paid?: number
+          rep_id?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
           subtotal?: number
           tax_total?: number
           total?: number
           updated_at?: string
+          visit_id?: string | null
           warehouse_id?: string | null
         }
         Relationships: [
@@ -1255,6 +1451,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_invoices_rep_id_fkey"
+            columns: ["rep_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
             referencedColumns: ["id"]
           },
           {
@@ -1488,6 +1691,7 @@ export type Database = {
     }
     Functions: {
       cash_or_bank_chart_id: { Args: { _account_id: string }; Returns: string }
+      current_employee_id: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
