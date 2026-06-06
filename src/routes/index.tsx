@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getPublicPricingPlans } from "@/lib/api/pricing.functions";
 import {
   ArrowLeft, Sparkles, ShieldCheck, Zap, BarChart3, Boxes, ShoppingCart,
   Users, Truck, Cloud, Smartphone, Globe, CheckCircle2, Star,
@@ -27,6 +30,14 @@ function Landing() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const pricingFn = useServerFn(getPublicPricingPlans);
+  const { data: pricingData } = useQuery({
+    queryKey: ["public_pricing_plans"],
+    queryFn: () => pricingFn(),
+  });
+  const plans = pricingData?.plans ?? [];
+  const fmt = new Intl.NumberFormat("ar-EG");
 
   return (
     <div dir="rtl" className="relative min-h-screen overflow-hidden bg-[#050816] text-white antialiased">

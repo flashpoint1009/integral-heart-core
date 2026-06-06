@@ -79,6 +79,7 @@ export function AppSidebar() {
           { url: "/developer/audit", icon: History, title: "سجل العمليات" } as Item,
           { url: "/developer/branding", icon: Palette, title: "شاشة الدخول" } as Item,
           { url: "/developer/backup", icon: Database, title: "نسخ احتياطي" } as Item,
+          { url: "/developer/pricing", icon: Crown, title: "أسعار اللاندينج" } as Item,
         ] : []),
       ],
     }] : []),
