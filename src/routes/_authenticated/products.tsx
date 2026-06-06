@@ -22,6 +22,8 @@ import {
 import { Plus, Pencil, Trash2, Search, Package, Tag, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { ExcelImportButton } from "@/components/app/excel-import";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/_authenticated/products")({
   head: () => ({ meta: [{ title: "Products — ERP" }] }),
@@ -44,6 +46,8 @@ const empty = {
 function Page() {
   const { t, i18n } = useTranslation();
   const qc = useQueryClient();
+  const { hasRole } = useAuth();
+  const canImport = hasRole("admin") || hasRole("manager") || hasRole("warehouse") || hasRole("accountant");
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
   const [form, setForm] = useState(empty);
@@ -137,7 +141,72 @@ function Page() {
 
   return (
     <div className="p-6">
-      <PageHeader title={t("products.title")} actions={<Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("products.add")}</Button>} />
+      <PageHeader title={t("products.title")} actions={
+        <div className="flex gap-2">
+          {canImport && (
+            <ExcelImportButton
+              label="استيراد منتجات"
+              title="استيراد منتجات من Excel"
+              description="حمّل النموذج، املأه، ثم ارفعه. التحديث يتم عبر SKU إن وُجد."
+              templateFileName="products-template.xlsx"
+              columns={[
+                { key: "name_ar", label: "الاسم بالعربية", required: true, example: "منتج تجريبي" },
+                { key: "name_en", label: "Name (EN)", example: "Sample" },
+                { key: "sku", label: "SKU", example: "SKU-001" },
+                { key: "barcode", label: "Barcode", example: "1234567890" },
+                { key: "category", label: "القسم", example: "مشروبات" },
+                { key: "unit", label: "الوحدة", example: "pcs" },
+                { key: "cost_price", label: "سعر التكلفة", example: "10" },
+                { key: "sale_price", label: "سعر البيع", required: true, example: "15" },
+                { key: "tax_rate", label: "نسبة الضريبة %", example: "14" },
+                { key: "min_stock", label: "الحد الأدنى للمخزون", example: "5" },
+              ]}
+              importRow={async (r) => {
+                const name_ar = String(r.name_ar ?? "").trim();
+                if (!name_ar) throw new Error("الاسم بالعربية مطلوب");
+                let category_id: string | null = null;
+                const catName = String(r.category ?? "").trim();
+                if (catName) {
+                  const found = cats.find((c: any) =>
+                    (c.name_ar ?? "").trim().toLowerCase() === catName.toLowerCase() ||
+                    (c.name_en ?? "").trim().toLowerCase() === catName.toLowerCase());
+                  if (found) category_id = found.id;
+                  else {
+                    const { data: created, error: ce } = await supabase.from("categories").insert({ name_ar: catName }).select("id").single();
+                    if (ce) throw new Error(ce.message);
+                    category_id = created.id;
+                  }
+                }
+                const payload = {
+                  name_ar,
+                  name_en: String(r.name_en ?? "").trim() || null,
+                  sku: String(r.sku ?? "").trim() || null,
+                  barcode: String(r.barcode ?? "").trim() || null,
+                  category_id,
+                  unit: String(r.unit ?? "").trim() || null,
+                  cost_price: Number(r.cost_price) || 0,
+                  sale_price: Number(r.sale_price) || 0,
+                  tax_rate: Number(r.tax_rate) || 0,
+                  min_stock: Number(r.min_stock) || 0,
+                  is_active: true,
+                };
+                if (payload.sku) {
+                  const { data: existing } = await supabase.from("products").select("id").eq("sku", payload.sku).maybeSingle();
+                  if (existing) {
+                    const { error } = await supabase.from("products").update(payload).eq("id", existing.id);
+                    if (error) throw new Error(error.message);
+                    return;
+                  }
+                }
+                const { error } = await supabase.from("products").insert(payload);
+                if (error) throw new Error(error.message);
+              }}
+              onDone={() => { qc.invalidateQueries({ queryKey: ["products"] }); qc.invalidateQueries({ queryKey: ["categories"] }); }}
+            />
+          )}
+          <Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("products.add")}</Button>
+        </div>
+      } />
 
       <div className="grid gap-4 sm:grid-cols-3 mb-4">
         {[
