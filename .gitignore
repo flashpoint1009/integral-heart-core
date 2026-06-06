@@ -30,3 +30,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment variables (managed by Lovable Cloud)
+.env
+.env.local
+.env.*.local

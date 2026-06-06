@@ -63,7 +63,7 @@ export function AppSidebar() {
     {
       label: t("nav.main"),
       items: [
-        { url: "/", icon: LayoutDashboard, title: t("nav.dashboard") },
+        { url: "/dashboard", icon: LayoutDashboard, title: t("nav.dashboard") },
         { url: "/pos", icon: ShoppingCart, title: t("nav.pos"), module: "pos" },
       ],
     },
