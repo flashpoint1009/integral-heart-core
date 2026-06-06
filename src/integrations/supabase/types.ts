@@ -151,6 +151,50 @@ export type Database = {
           },
         ]
       }
+      bonuses: {
+        Row: {
+          amount: number
+          bonus_type: string
+          created_at: string
+          created_by: string | null
+          employee_id: string
+          id: string
+          period_month: string
+          reason: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          bonus_type?: string
+          created_at?: string
+          created_by?: string | null
+          employee_id: string
+          id?: string
+          period_month: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          bonus_type?: string
+          created_at?: string
+          created_by?: string | null
+          employee_id?: string
+          id?: string
+          period_month?: string
+          reason?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bonuses_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
