@@ -27,6 +27,8 @@ import {
   Trophy,
   Globe,
   Package2,
+  Bell,
+  Palette,
 } from "lucide-react";
 import {
   Sidebar,
@@ -74,7 +76,14 @@ export function AppSidebar() {
         { url: "/developer/modules", icon: Layers, title: "المكونات" } as Item,
         ...(isDeveloper ? [
           { url: "/developer/audit", icon: History, title: "سجل العمليات" } as Item,
+          { url: "/developer/branding", icon: Palette, title: "شاشة الدخول" } as Item,
         ] : []),
+      ],
+    }] : []),
+    ...(hasAnyRole(["admin","manager","supervisor","hr"]) ? [{
+      label: "التواصل",
+      items: [
+        { url: "/notifications/send", icon: Bell, title: "إرسال إشعار" } as Item,
       ],
     }] : []),
     ...(showSupervisor ? [{
