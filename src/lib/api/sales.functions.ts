@@ -16,6 +16,8 @@ const InputSchema = z.object({
   invoice_date: z.string().optional(),
   notes: z.string().max(1000).nullable().optional(),
   paid: z.number().min(0).default(0),
+  rep_id: z.string().uuid().nullable().optional(),
+  visit_id: z.string().uuid().nullable().optional(),
   items: z.array(ItemSchema).min(1).max(200),
 });
 
@@ -69,6 +71,8 @@ export const createSale = createServerFn({ method: "POST" })
         total,
         paid,
         status,
+        rep_id: data.rep_id ?? null,
+        visit_id: data.visit_id ?? null,
         created_by: userId,
       })
       .select("id, invoice_number")

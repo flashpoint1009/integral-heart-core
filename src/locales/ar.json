@@ -81,7 +81,9 @@
     "admin": "مدير النظام",
     "manager": "مدير",
     "cashier": "كاشير",
-    "accountant": "محاسب"
+    "accountant": "محاسب",
+    "sales_rep": "مندوب مبيعات",
+    "supervisor": "مشرف"
   },
   "categories": {
     "title": "الفئات",
@@ -287,7 +289,7 @@
   },
   "finance": {
     "title": "المالية والحسابات",
-    "description": "إدارة الخزائن والمصروفات والمدفوعات والقيود اليومية",
+    "description": "الوصف",
     "accounts": "الخزائن والبنوك",
     "expenses": "المصروفات",
     "transfers": "تحويلات بين الحسابات",
@@ -297,7 +299,7 @@
     "journal": "القيود اليومية",
     "addAccount": "إضافة حساب",
     "accountName": "اسم الحساب",
-    "accountType": "النوع",
+    "accountType": "نوع الحساب",
     "accountNumber": "رقم الحساب",
     "bank": "البنك",
     "balance": "الرصيد",
@@ -322,19 +324,25 @@
     "from": "من حساب",
     "to": "إلى حساب",
     "code": "الكود",
-    "description": "الوصف",
     "debit": "مدين",
     "credit": "دائن",
     "noEntries": "لا توجد قيود يومية بعد",
-    "types": { "cash": "خزينة كاش", "bank": "حساب بنكي" },
-    "coaTypes": { "asset": "أصول", "liability": "التزامات", "equity": "حقوق ملكية", "income": "إيرادات", "expense": "مصروفات" },
+    "types": {
+      "cash": "خزينة كاش",
+      "bank": "حساب بنكي"
+    },
+    "coaTypes": {
+      "asset": "أصول",
+      "liability": "التزامات",
+      "equity": "حقوق ملكية",
+      "income": "إيرادات",
+      "expense": "مصروفات"
+    },
     "trialBalance": "ميزان المراجعة",
     "totalDebit": "إجمالي المدين",
     "totalCredit": "إجمالي الدائن",
     "balanceCheck": "الفرق",
     "balanced": "متوازن ✓",
-    "balance": "الرصيد",
-    "accountType": "نوع الحساب",
     "total": "الإجمالي"
   },
   "hr": {
@@ -380,13 +388,23 @@
     "approve": "موافقة",
     "reject": "رفض",
     "totalRequests": "إجمالي الطلبات",
-    "leaveTypes": { "annual": "سنوية", "casual": "عارضة", "sick": "مرضية", "unpaid": "بدون أجر", "other": "أخرى" },
+    "leaveTypes": {
+      "annual": "سنوية",
+      "casual": "عارضة",
+      "sick": "مرضية",
+      "unpaid": "بدون أجر",
+      "other": "أخرى"
+    },
     "period": "الشهر",
     "employeesCount": "عدد الموظفين",
     "totalNet": "إجمالي الصافي",
     "generatePayroll": "إنشاء كشف الرواتب",
     "noPayrollYet": "لم يتم إنشاء كشف رواتب لهذا الشهر بعد",
-    "runStatus": { "draft": "مسودة", "approved": "معتمد", "paid": "مدفوع" },
+    "runStatus": {
+      "draft": "مسودة",
+      "approved": "معتمد",
+      "paid": "مدفوع"
+    },
     "penalties": "الجزاءات",
     "advances": "السلف",
     "addPenalty": "إضافة جزاء",
@@ -421,6 +439,53 @@
     "addBonus": "إضافة حافز / مكافأة",
     "bonusType": "النوع",
     "total": "الإجمالي",
-    "bonusTypes": { "incentive": "حافز", "bonus": "مكافأة", "overtime": "إضافي" }
+    "bonusTypes": {
+      "incentive": "حافز",
+      "bonus": "مكافأة",
+      "overtime": "إضافي"
+    }
+  },
+  "rep": {
+    "appName": "تطبيق المندوب",
+    "home": "الرئيسية",
+    "attendance": "الحضور",
+    "customers": "العملاء",
+    "routeToday": "خط السير",
+    "quickSale": "بيع سريع",
+    "greeting": "أهلاً بك",
+    "dashboardTitle": "يوم عمل جديد",
+    "dayActive": "يومك بدأ",
+    "dayEnded": "انتهى اليوم",
+    "notCheckedIn": "لم تسجل الحضور بعد",
+    "todaySales": "مبيعات اليوم",
+    "visitsCount": "زيارات اليوم",
+    "routeProgress": "تقدّم السير",
+    "checkIn": "وقت الحضور",
+    "status": "الحالة",
+    "checkInTime": "حضور",
+    "checkOutTime": "انصراف",
+    "startDay": "بدء يوم العمل",
+    "endDay": "إنهاء اليوم",
+    "dayCompleted": "تم تسجيل اليوم بنجاح",
+    "gpsHint": "سيتم التقاط موقعك تلقائيًا عند التسجيل",
+    "checkedIn": "تم تسجيل الحضور",
+    "checkedOut": "تم تسجيل الانصراف",
+    "addCustomer": "إضافة عميل",
+    "landmark": "علامة مميزة",
+    "landmarkHint": "بجوار / أمام / خلف",
+    "captureLocation": "التقاط موقع GPS",
+    "gpsCaptured": "تم التقاط الموقع",
+    "gpsFailed": "تعذّر التقاط الموقع",
+    "balance": "المديونية",
+    "searchProduct": "بحث عن منتج",
+    "cartEmpty": "السلة فارغة",
+    "saveAndPrint": "حفظ وطباعة",
+    "routeHint": "العملاء المخطط لزيارتهم اليوم",
+    "noRoute": "لا يوجد خط سير محدد لهذا اليوم",
+    "routeStatus": {
+      "pending": "في الانتظار",
+      "done": "تم",
+      "skipped": "متخطى"
+    }
   }
 }

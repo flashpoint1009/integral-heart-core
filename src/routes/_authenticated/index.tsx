@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
+import { useNavigate } from "@tanstack/react-router";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, Users, Receipt, TrendingUp, AlertTriangle, ArrowUpRight, ShoppingCart } from "lucide-react";
@@ -28,7 +29,15 @@ type LowProduct = { id: string; name_ar: string; name_en: string | null; min_sto
 
 function Dashboard() {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, roles } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!roles.length) return;
+    const isRepOnly = roles.length === 1 && roles[0] === "sales_rep";
+    if (isRepOnly) navigate({ to: "/rep", replace: true });
+  }, [roles, navigate]);
+
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<RecentInvoice[]>([]);
   const [lowProducts, setLowProducts] = useState<LowProduct[]>([]);
