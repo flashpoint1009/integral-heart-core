@@ -407,6 +407,12 @@
     "recalculate": "Recalculate",
     "totalDeductions": "Total Deductions",
     "approveAdvance": "Approve",
-    "rejectAdvance": "Reject"
+    "rejectAdvance": "Reject",
+    "importAttendance": "Import Fingerprint (Excel)",
+    "importDone": "Imported {{ok}} rows, skipped {{skipped}}",
+    "addBonus": "Add Bonus / Incentive",
+    "bonusType": "Type",
+    "total": "Total",
+    "bonusTypes": { "incentive": "Incentive", "bonus": "Bonus", "overtime": "Overtime" }
   }
 }
