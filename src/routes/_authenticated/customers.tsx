@@ -16,7 +16,8 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Users, Wallet, AlertCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/customers")({
@@ -107,9 +108,28 @@ function Page() {
   return (
     <div className="p-6">
       <PageHeader title={t("customers.title")} actions={<Button onClick={openNew}><Plus className="h-4 w-4 me-2" />{t("customers.add")}</Button>} />
+      <div className="grid gap-4 sm:grid-cols-3 mb-4">
+        {[
+          { label: t("customers.title"), value: rows.length, icon: Users, tint: "from-primary/10 to-primary/0", color: "text-primary" },
+          { label: t("customers.balance"), value: rows.reduce((s, r) => s + Number(r.balance || 0), 0).toFixed(2), icon: Wallet, tint: "from-amber-500/10 to-amber-500/0", color: "text-amber-600" },
+          { label: t("customers.credit_limit"), value: rows.reduce((s, r) => s + Number(r.credit_limit || 0), 0).toFixed(2), icon: AlertCircle, tint: "from-violet-500/10 to-violet-500/0", color: "text-violet-600" },
+        ].map((c) => (
+          <Card key={c.label} className={`bg-gradient-to-br ${c.tint} border-border/60`}>
+            <CardContent className="pt-5 flex items-center justify-between">
+              <div>
+                <div className="text-xs text-muted-foreground">{c.label}</div>
+                <div className="text-2xl font-bold tabular-nums mt-1">{c.value}</div>
+              </div>
+              <div className={`h-10 w-10 rounded-xl bg-background/60 grid place-items-center ${c.color}`}>
+                <c.icon className="h-5 w-5" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
       <div className="mb-4 relative max-w-sm">
-        <Search className="absolute start-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input className="ps-8" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input className="ps-9 rounded-full shadow-sm focus-visible:ring-2 focus-visible:ring-primary/30" placeholder={t("common.search")} value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
       <div className="rounded-md border bg-card overflow-x-auto">
         <Table>
@@ -129,12 +149,12 @@ function Page() {
             ) : filtered.length === 0 ? (
               <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{t("common.empty")}</TableCell></TableRow>
             ) : filtered.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell className="font-medium">{r.name}</TableCell>
+              <TableRow key={r.id} className="hover:bg-muted/40">
+                <TableCell className="font-semibold text-primary">{r.name}</TableCell>
                 <TableCell className="text-muted-foreground font-mono text-sm">{r.phone ?? "—"}</TableCell>
                 <TableCell className="text-muted-foreground">{r.email ?? "—"}</TableCell>
                 <TableCell className={`text-end tabular-nums ${Number(r.balance) > 0 ? "text-destructive" : ""}`}>{Number(r.balance).toFixed(2)}</TableCell>
-                <TableCell>{r.is_active ? <Badge>{t("common.active")}</Badge> : <Badge variant="outline">{t("common.inactive")}</Badge>}</TableCell>
+                <TableCell>{r.is_active ? <Badge className="rounded-full">{t("common.active")}</Badge> : <Badge variant="outline" className="rounded-full">{t("common.inactive")}</Badge>}</TableCell>
                 <TableCell className="text-end">
                   <div className="flex gap-1 justify-end">
                     <Button size="icon" variant="ghost" onClick={() => openEdit(r)}><Pencil className="h-4 w-4" /></Button>
