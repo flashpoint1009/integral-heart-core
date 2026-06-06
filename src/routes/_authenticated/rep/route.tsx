@@ -19,7 +19,7 @@ function RepLayout() {
   useEffect(() => {
     if (!roles.length) return;
     const allowed = roles.some((r) => ["sales_rep", "admin", "manager", "supervisor"].includes(r));
-    if (!allowed) navigate({ to: "/", replace: true });
+    if (!allowed) navigate({ to: "/dashboard", replace: true });
   }, [roles, navigate]);
 
   const tabs = [

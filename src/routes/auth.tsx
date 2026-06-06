@@ -34,7 +34,7 @@ function AuthPage() {
   const { data: brandData } = useQuery({ queryKey: ["auth_branding"], queryFn: () => brandFn() });
   const brand = brandData?.branding as any;
 
-  if (!loading && user) return <Navigate to="/" replace />;
+  if (!loading && user) return <Navigate to="/dashboard" replace />;
 
   const onSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +43,7 @@ function AuthPage() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("auth.welcomeBack"));
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/dashboard", replace: true });
   };
 
   const onSignUp = async (e: React.FormEvent) => {
@@ -60,7 +60,7 @@ function AuthPage() {
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(t("auth.welcome"));
-    navigate({ to: "/", replace: true });
+    navigate({ to: "/dashboard", replace: true });
   };
 
   const onGoogle = async () => {
@@ -71,7 +71,7 @@ function AuthPage() {
       toast.error(r.error.message);
       return;
     }
-    if (!r.redirected) navigate({ to: "/", replace: true });
+    if (!r.redirected) navigate({ to: "/dashboard", replace: true });
   };
 
   return (

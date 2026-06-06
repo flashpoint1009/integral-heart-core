@@ -17,7 +17,7 @@ function SupervisorLayout() {
   useEffect(() => {
     if (!roles.length) return;
     const allowed = roles.some((r) => ["supervisor", "admin", "manager"].includes(r));
-    if (!allowed) navigate({ to: "/", replace: true });
+    if (!allowed) navigate({ to: "/dashboard", replace: true });
   }, [roles, navigate]);
 
   const tabs = [
