@@ -16,8 +16,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Users, CalendarCheck, PlaneTakeoff, Wallet, CheckCircle2, XCircle, Clock, AlertOctagon, HandCoins, Zap, Calculator, Trash2 } from "lucide-react";
+import { Plus, Users, CalendarCheck, PlaneTakeoff, Wallet, CheckCircle2, XCircle, Clock, AlertOctagon, HandCoins, Zap, Calculator, Trash2, Gift, Upload } from "lucide-react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 export const Route = createFileRoute("/_authenticated/hr")({
   head: () => ({ meta: [{ title: "HR — ERP" }] }),
@@ -58,6 +59,7 @@ function Page() {
           <TabsTrigger value="leaves" className="gap-2"><PlaneTakeoff className="h-4 w-4" />{t("hr.leaves")}</TabsTrigger>
           <TabsTrigger value="penalties" className="gap-2"><AlertOctagon className="h-4 w-4" />{t("hr.penalties")}</TabsTrigger>
           <TabsTrigger value="advances" className="gap-2"><HandCoins className="h-4 w-4" />{t("hr.advances")}</TabsTrigger>
+          <TabsTrigger value="bonuses" className="gap-2"><Gift className="h-4 w-4" />{t("hr.bonuses")}</TabsTrigger>
           <TabsTrigger value="payroll" className="gap-2"><Wallet className="h-4 w-4" />{t("hr.payroll")}</TabsTrigger>
         </TabsList>
         <TabsContent value="employees" className="mt-4"><EmployeesTab /></TabsContent>
@@ -65,6 +67,7 @@ function Page() {
         <TabsContent value="leaves" className="mt-4"><LeavesTab /></TabsContent>
         <TabsContent value="penalties" className="mt-4"><PenaltiesTab /></TabsContent>
         <TabsContent value="advances" className="mt-4"><AdvancesTab /></TabsContent>
+        <TabsContent value="bonuses" className="mt-4"><BonusesTab /></TabsContent>
         <TabsContent value="payroll" className="mt-4"><PayrollTab /></TabsContent>
       </Tabs>
     </div>
