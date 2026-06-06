@@ -13,6 +13,7 @@ import {
   Settings,
   UserCog,
   Boxes,
+  History,
 } from "lucide-react";
 import {
   Sidebar,
@@ -47,6 +48,7 @@ export function AppSidebar() {
       items: [
         { url: "/sales", icon: Receipt, title: t("nav.sales") },
         { url: "/inventory", icon: Boxes, title: t("nav.inventory") },
+        { url: "/movements", icon: History, title: t("movements.title") },
       ],
     },
     {
