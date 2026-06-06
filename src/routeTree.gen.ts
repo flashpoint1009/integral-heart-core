@@ -31,6 +31,7 @@ import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authentic
 import { Route as AuthenticatedRepRouteRouteImport } from './routes/_authenticated/rep/route'
 import { Route as AuthenticatedSupervisorIndexRouteImport } from './routes/_authenticated/supervisor.index'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep/index'
+import { Route as AuthenticatedSupervisorLiveRouteImport } from './routes/_authenticated/supervisor.live'
 import { Route as AuthenticatedRepSaleRouteImport } from './routes/_authenticated/rep/sale'
 import { Route as AuthenticatedRepPlanRouteImport } from './routes/_authenticated/rep/plan'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep/customers'
@@ -147,6 +148,12 @@ const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRepRouteRoute,
 } as any)
+const AuthenticatedSupervisorLiveRoute =
+  AuthenticatedSupervisorLiveRouteImport.update({
+    id: '/live',
+    path: '/live',
+    getParentRoute: () => AuthenticatedSupervisorRoute,
+  } as any)
 const AuthenticatedRepSaleRoute = AuthenticatedRepSaleRouteImport.update({
   id: '/sale',
   path: '/sale',
@@ -200,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
   '/rep/sale': typeof AuthenticatedRepSaleRoute
+  '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
   '/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -226,6 +234,7 @@ export interface FileRoutesByTo {
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/rep/plan': typeof AuthenticatedRepPlanRoute
   '/rep/sale': typeof AuthenticatedRepSaleRoute
+  '/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/rep': typeof AuthenticatedRepIndexRoute
   '/supervisor': typeof AuthenticatedSupervisorIndexRoute
   '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -256,6 +265,7 @@ export interface FileRoutesById {
   '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
   '/_authenticated/rep/plan': typeof AuthenticatedRepPlanRoute
   '/_authenticated/rep/sale': typeof AuthenticatedRepSaleRoute
+  '/_authenticated/supervisor/live': typeof AuthenticatedSupervisorLiveRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
   '/_authenticated/supervisor/': typeof AuthenticatedSupervisorIndexRoute
   '/_authenticated/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/rep/customers'
     | '/rep/plan'
     | '/rep/sale'
+    | '/supervisor/live'
     | '/rep/'
     | '/supervisor/'
     | '/rep/visit/$customerId'
@@ -312,6 +323,7 @@ export interface FileRouteTypes {
     | '/rep/customers'
     | '/rep/plan'
     | '/rep/sale'
+    | '/supervisor/live'
     | '/rep'
     | '/supervisor'
     | '/rep/visit/$customerId'
@@ -341,6 +353,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rep/customers'
     | '/_authenticated/rep/plan'
     | '/_authenticated/rep/sale'
+    | '/_authenticated/supervisor/live'
     | '/_authenticated/rep/'
     | '/_authenticated/supervisor/'
     | '/_authenticated/rep/visit/$customerId'
@@ -507,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepIndexRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/supervisor/live': {
+      id: '/_authenticated/supervisor/live'
+      path: '/live'
+      fullPath: '/supervisor/live'
+      preLoaderRoute: typeof AuthenticatedSupervisorLiveRouteImport
+      parentRoute: typeof AuthenticatedSupervisorRoute
+    }
     '/_authenticated/rep/sale': {
       id: '/_authenticated/rep/sale'
       path: '/sale'
@@ -569,11 +589,13 @@ const AuthenticatedRepRouteRouteWithChildren =
   )
 
 interface AuthenticatedSupervisorRouteChildren {
+  AuthenticatedSupervisorLiveRoute: typeof AuthenticatedSupervisorLiveRoute
   AuthenticatedSupervisorIndexRoute: typeof AuthenticatedSupervisorIndexRoute
 }
 
 const AuthenticatedSupervisorRouteChildren: AuthenticatedSupervisorRouteChildren =
   {
+    AuthenticatedSupervisorLiveRoute: AuthenticatedSupervisorLiveRoute,
     AuthenticatedSupervisorIndexRoute: AuthenticatedSupervisorIndexRoute,
   }
 
