@@ -26,6 +26,8 @@ interface AuthCtx {
   hasAnyRole: (rs: Role[]) => boolean;
   isDeveloper: boolean;
   moduleEnabled: (key: string) => boolean;
+  screenAllowed: (key: string) => boolean;
+  deniedScreens: string[];
 }
 
 const Ctx = createContext<AuthCtx | null>(null);
@@ -36,6 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [roles, setRoles] = useState<Role[]>([]);
   const [tenantId, setTenantId] = useState<string | null>(null);
   const [enabledModules, setEnabledModules] = useState<string[]>([]);
+  const [deniedScreens, setDeniedScreens] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -59,6 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setEnabledModules([]);
       }
+      const { data: perms } = await supabase
+        .from("user_screen_permissions")
+        .select("screen_key, allowed")
+        .eq("user_id", uid);
+      setDeniedScreens((perms ?? []).filter((p) => !p.allowed).map((p) => p.screen_key));
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
@@ -69,6 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles([]);
         setTenantId(null);
         setEnabledModules([]);
+        setDeniedScreens([]);
       }
     });
 
@@ -97,6 +106,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isDeveloper: roles.includes("developer"),
     moduleEnabled: (key: string) =>
       roles.includes("developer") || enabledModules.length === 0 || enabledModules.includes(key),
+    screenAllowed: (key: string) => roles.includes("developer") || !deniedScreens.includes(key),
+    deniedScreens,
   };
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
