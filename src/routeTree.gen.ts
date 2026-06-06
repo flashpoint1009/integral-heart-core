@@ -30,6 +30,7 @@ import { Route as AuthenticatedCustomersRouteImport } from './routes/_authentica
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedRepRouteRouteImport } from './routes/_authenticated/rep.route'
 import { Route as AuthenticatedRepIndexRouteImport } from './routes/_authenticated/rep.index'
+import { Route as AuthenticatedRepSaleRouteImport } from './routes/_authenticated/rep.sale'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep.customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep.attendance'
 
@@ -137,6 +138,11 @@ const AuthenticatedRepIndexRoute = AuthenticatedRepIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRepRoute,
 } as any)
+const AuthenticatedRepSaleRoute = AuthenticatedRepSaleRouteImport.update({
+  id: '/sale',
+  path: '/sale',
+  getParentRoute: () => AuthenticatedRepRoute,
+} as any)
 const AuthenticatedRepCustomersRoute =
   AuthenticatedRepCustomersRouteImport.update({
     id: '/customers',
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/warehouses': typeof AuthenticatedWarehousesRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
+  '/rep/sale': typeof AuthenticatedRepSaleRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRoutesByTo {
@@ -194,6 +201,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/rep/customers': typeof AuthenticatedRepCustomersRoute
+  '/rep/sale': typeof AuthenticatedRepSaleRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/rep/attendance': typeof AuthenticatedRepAttendanceRoute
   '/_authenticated/rep/customers': typeof AuthenticatedRepCustomersRoute
+  '/_authenticated/rep/sale': typeof AuthenticatedRepSaleRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
 }
 export interface FileRouteTypes {
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/warehouses'
     | '/rep/attendance'
     | '/rep/customers'
+    | '/rep/sale'
     | '/rep/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/'
     | '/rep/attendance'
     | '/rep/customers'
+    | '/rep/sale'
   id:
     | '__root__'
     | '/_authenticated'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/rep/attendance'
     | '/_authenticated/rep/customers'
+    | '/_authenticated/rep/sale'
     | '/_authenticated/rep/'
   fileRoutesById: FileRoutesById
 }
@@ -446,6 +458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepIndexRouteImport
       parentRoute: typeof AuthenticatedRepRoute
     }
+    '/_authenticated/rep/sale': {
+      id: '/_authenticated/rep/sale'
+      path: '/sale'
+      fullPath: '/rep/sale'
+      preLoaderRoute: typeof AuthenticatedRepSaleRouteImport
+      parentRoute: typeof AuthenticatedRepRoute
+    }
     '/_authenticated/rep/customers': {
       id: '/_authenticated/rep/customers'
       path: '/customers'
@@ -466,12 +485,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRepRouteChildren {
   AuthenticatedRepAttendanceRoute: typeof AuthenticatedRepAttendanceRoute
   AuthenticatedRepCustomersRoute: typeof AuthenticatedRepCustomersRoute
+  AuthenticatedRepSaleRoute: typeof AuthenticatedRepSaleRoute
   AuthenticatedRepIndexRoute: typeof AuthenticatedRepIndexRoute
 }
 
 const AuthenticatedRepRouteChildren: AuthenticatedRepRouteChildren = {
   AuthenticatedRepAttendanceRoute: AuthenticatedRepAttendanceRoute,
   AuthenticatedRepCustomersRoute: AuthenticatedRepCustomersRoute,
+  AuthenticatedRepSaleRoute: AuthenticatedRepSaleRoute,
   AuthenticatedRepIndexRoute: AuthenticatedRepIndexRoute,
 }
 
