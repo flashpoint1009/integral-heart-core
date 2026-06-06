@@ -869,6 +869,8 @@ function PayrollTab() {
             <TableHead className="text-end">{t("hr.baseSalary")}</TableHead>
             <TableHead className="text-end">{t("hr.allowances")}</TableHead>
             <TableHead className="text-end">{t("hr.transportAllowance")}</TableHead>
+            <TableHead className="text-end">{t("hr.bonuses")}</TableHead>
+            <TableHead className="text-end">{t("hr.incentives")}</TableHead>
             <TableHead className="text-end">{t("hr.insurance")}</TableHead>
             <TableHead className="text-end">{t("hr.absenceDays")}</TableHead>
             <TableHead className="text-end">{t("hr.absenceDeduction")}</TableHead>
@@ -878,13 +880,15 @@ function PayrollTab() {
           </TableRow></TableHeader>
           <TableBody>
             {(items as any[]).length === 0 ? (
-              <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">{currentRun ? t("common.empty") : t("hr.noPayrollYet")}</TableCell></TableRow>
+              <TableRow><TableCell colSpan={12} className="text-center py-8 text-muted-foreground">{currentRun ? t("common.empty") : t("hr.noPayrollYet")}</TableCell></TableRow>
             ) : (items as any[]).map((it: any) => (
               <TableRow key={it.id} className="hover:bg-muted/40">
                 <TableCell className="font-semibold text-primary">{it.employees?.full_name}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.base_salary))}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.allowances))}</TableCell>
                 <TableCell className="text-end tabular-nums">{fmt(Number(it.transport_allowance))}</TableCell>
+                <TableCell className="text-end tabular-nums text-emerald-700">{fmt(Number(it.bonuses))}</TableCell>
+                <TableCell className="text-end tabular-nums text-emerald-700">{fmt(Number(it.incentives))}</TableCell>
                 <TableCell className="text-end tabular-nums text-rose-600">{fmt(Number(it.insurance))}</TableCell>
                 <TableCell className="text-end tabular-nums">{it.absence_days ?? 0}</TableCell>
                 <TableCell className="text-end tabular-nums text-rose-600">{fmt(Number(it.absence_deduction))}</TableCell>
