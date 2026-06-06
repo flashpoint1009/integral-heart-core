@@ -24,6 +24,7 @@ function RepLayout() {
   const tabs = [
     { to: "/rep", icon: Home, label: t("rep.home") },
     { to: "/rep/plan", icon: Calendar, label: t("rep.routeToday") },
+    { to: "/rep/customers", icon: Users, label: t("rep.customers") },
     { to: "/rep/sale", icon: ShoppingCart, label: t("rep.quickSale") },
     { to: "/rep/requests", icon: FileText, label: "طلباتي" },
     { to: "/rep/attendance", icon: MapPin, label: t("rep.attendance") },
@@ -49,7 +50,7 @@ function RepLayout() {
       </main>
 
       <nav className="fixed bottom-0 inset-x-0 z-40 bg-background border-t shadow-[0_-2px_10px_rgba(0,0,0,0.04)]">
-        <ul className="grid grid-cols-5">
+        <ul className="grid grid-cols-6">
           {tabs.map((tab) => {
             const active = pathname === tab.to || (tab.to !== "/rep" && pathname.startsWith(tab.to));
             return (
