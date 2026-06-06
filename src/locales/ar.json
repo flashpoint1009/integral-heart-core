@@ -327,7 +327,15 @@
     "credit": "دائن",
     "noEntries": "لا توجد قيود يومية بعد",
     "types": { "cash": "خزينة كاش", "bank": "حساب بنكي" },
-    "coaTypes": { "asset": "أصول", "liability": "التزامات", "equity": "حقوق ملكية", "income": "إيرادات", "expense": "مصروفات" }
+    "coaTypes": { "asset": "أصول", "liability": "التزامات", "equity": "حقوق ملكية", "income": "إيرادات", "expense": "مصروفات" },
+    "trialBalance": "ميزان المراجعة",
+    "totalDebit": "إجمالي المدين",
+    "totalCredit": "إجمالي الدائن",
+    "balanceCheck": "الفرق",
+    "balanced": "متوازن ✓",
+    "balance": "الرصيد",
+    "accountType": "نوع الحساب",
+    "total": "الإجمالي"
   },
   "hr": {
     "title": "الموارد البشرية",

@@ -327,7 +327,15 @@
     "credit": "Credit",
     "noEntries": "No journal entries yet",
     "types": { "cash": "Cash", "bank": "Bank" },
-    "coaTypes": { "asset": "Assets", "liability": "Liabilities", "equity": "Equity", "income": "Income", "expense": "Expenses" }
+    "coaTypes": { "asset": "Assets", "liability": "Liabilities", "equity": "Equity", "income": "Income", "expense": "Expenses" },
+    "trialBalance": "Trial Balance",
+    "totalDebit": "Total Debit",
+    "totalCredit": "Total Credit",
+    "balanceCheck": "Difference",
+    "balanced": "Balanced ✓",
+    "balance": "Balance",
+    "accountType": "Type",
+    "total": "Total"
   },
   "hr": {
     "title": "Human Resources",

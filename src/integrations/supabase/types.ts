@@ -269,6 +269,13 @@ export type Database = {
             referencedRelation: "chart_accounts"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "chart_accounts_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "v_trial_balance"
+            referencedColumns: ["account_id"]
+          },
         ]
       }
       company_settings: {
@@ -628,6 +635,8 @@ export type Database = {
           entry_number: number
           id: string
           reference: string | null
+          source_id: string | null
+          source_type: string | null
           total_credit: number
           total_debit: number
         }
@@ -639,6 +648,8 @@ export type Database = {
           entry_number?: number
           id?: string
           reference?: string | null
+          source_id?: string | null
+          source_type?: string | null
           total_credit?: number
           total_debit?: number
         }
@@ -650,6 +661,8 @@ export type Database = {
           entry_number?: number
           id?: string
           reference?: string | null
+          source_id?: string | null
+          source_type?: string | null
           total_credit?: number
           total_debit?: number
         }
@@ -687,6 +700,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "chart_accounts"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_entry_lines_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "v_trial_balance"
+            referencedColumns: ["account_id"]
           },
           {
             foreignKeyName: "journal_entry_lines_entry_id_fkey"
@@ -1452,9 +1472,22 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_trial_balance: {
+        Row: {
+          account_id: string | null
+          balance: number | null
+          code: string | null
+          name_ar: string | null
+          name_en: string | null
+          total_credit: number | null
+          total_debit: number | null
+          type: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      cash_or_bank_chart_id: { Args: { _account_id: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1463,6 +1496,20 @@ export type Database = {
         Returns: boolean
       }
       mark_auto_absent: { Args: { p_date?: string }; Returns: number }
+      post_journal_auto: {
+        Args: {
+          _amount: number
+          _created_by: string
+          _credit_account: string
+          _date: string
+          _debit_account: string
+          _desc: string
+          _ref: string
+          _source_id: string
+          _source_type: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "manager" | "cashier" | "accountant"
