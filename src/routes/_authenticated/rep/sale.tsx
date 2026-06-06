@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 import { useTranslation } from "react-i18next";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { createSale } from "@/lib/api/sales.functions";
+import { endVisit } from "@/lib/api/rep.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +16,8 @@ import { Plus, Minus, Trash2, Search, ShoppingCart, Printer } from "lucide-react
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/rep/sale")({
+  validateSearch: (search: Record<string, unknown>) =>
+    z.object({ visit: z.string().uuid().optional(), customer: z.string().uuid().optional() }).parse(search),
   component: RepSale,
 });
 
@@ -22,12 +26,16 @@ type CartItem = { product_id: string; name: string; quantity: number; unit_price
 function RepSale() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { visit: visitParam, customer: customerParam } = Route.useSearch();
   const createSaleFn = useServerFn(createSale);
-  const [customerId, setCustomerId] = useState<string>("");
+  const endVisitFn = useServerFn(endVisit);
+  const [customerId, setCustomerId] = useState<string>(customerParam ?? "");
   const [warehouseId, setWarehouseId] = useState<string>("");
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [paid, setPaid] = useState("0");
+
+  useEffect(() => { if (customerParam && !customerId) setCustomerId(customerParam); }, [customerParam, customerId]);
 
   const { data: customers = [] } = useQuery({
     queryKey: ["rep_sale_customers"],
@@ -87,15 +95,20 @@ function RepSale() {
           warehouse_id: warehouseId,
           paid: Number(paid) || 0,
           rep_id: emp?.id ?? null,
+          visit_id: visitParam ?? null,
           items: cart.map((i) => ({ product_id: i.product_id, quantity: i.quantity, unit_price: i.unit_price, discount: 0, tax_rate: i.tax_rate })),
         },
       });
     },
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
       toast.success(`${t("common.saved")} · ${res.invoice_number}`);
       setCart([]); setPaid("0");
-      // Navigate to invoice preview via sales detail
-      navigate({ to: "/sales", search: { detail: res.id } as any });
+      if (visitParam) {
+        try { await endVisitFn({ data: { visit_id: visitParam, outcome: "sold", invoice_id: res.id } }); } catch {}
+        navigate({ to: "/rep" });
+      } else {
+        navigate({ to: "/sales", search: { detail: res.id } as any });
+      }
     },
     onError: (e: Error) => toast.error(e.message),
   });

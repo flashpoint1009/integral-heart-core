@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Plus, Phone, MapPin, Search, Loader2 } from "lucide-react";
+import { Plus, Phone, MapPin, Search, Loader2, Play } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/rep/customers")({
@@ -80,6 +80,9 @@ function RepCustomers() {
                 <div className={`font-semibold tabular-nums ${Number(c.balance) > 0 ? "text-amber-600" : ""}`}>{fmt(Number(c.balance || 0))}</div>
               </div>
             </div>
+            <Link to="/rep/visit/$customerId" params={{ customerId: c.id }} className="mt-3 inline-flex items-center justify-center gap-1 h-9 w-full rounded-xl bg-primary text-primary-foreground text-xs font-semibold">
+              <Play className="h-3 w-3" />{t("rep.startVisit")}
+            </Link>
           </li>
         ))}
       </ul>

@@ -22,7 +22,8 @@
     "system": "النظام",
     "finance": "المالية وHR",
     "financeHub": "المالية والحسابات",
-    "hr": "الموارد البشرية"
+    "hr": "الموارد البشرية",
+    "field": "الميدان"
   },
   "auth": {
     "signIn": "تسجيل الدخول",
@@ -486,6 +487,49 @@
       "pending": "في الانتظار",
       "done": "تم",
       "skipped": "متخطى"
+    },
+    "startVisit": "بدء زيارة",
+    "visitActive": "الزيارة نشطة",
+    "startingVisit": "جاري بدء الزيارة...",
+    "visitEnded": "تم إنهاء الزيارة",
+    "makeSale": "إجراء بيع",
+    "collect": "تحصيل",
+    "collected": "تم التحصيل",
+    "confirmCollect": "تأكيد التحصيل",
+    "endVisitAs": "إنهاء الزيارة كـ",
+    "invalidAmount": "أدخل مبلغ صحيح",
+    "selectAccount": "اختر الحساب",
+    "outcome": {
+      "no_sale": "بدون بيع",
+      "not_found": "غير موجود",
+      "rescheduled": "إعادة جدولة",
+      "sold": "تم البيع",
+      "collected": "تم التحصيل"
     }
+  },
+  "supervisor": {
+    "title": "لوحة المشرف",
+    "subtitle": "متابعة المندوبين والميدان",
+    "overview": "نظرة عامة",
+    "liveMap": "الخريطة الحية",
+    "routes": "خطوط السير",
+    "reports": "التقارير",
+    "activeReps": "مندوبين نشطين",
+    "todaySales": "مبيعات اليوم",
+    "visitsToday": "زيارات اليوم",
+    "routesProgress": "تقدم السير",
+    "repsToday": "مندوبي اليوم",
+    "status": { "active": "نشط", "ended": "أنهى اليوم" },
+    "rep": "المندوب",
+    "date": "التاريخ",
+    "selectRep": "اختر المندوب",
+    "plannedStops": "المحطات المخططة",
+    "noStops": "لا توجد محطات. أضف عملاء من اليمين.",
+    "addCustomers": "إضافة عملاء",
+    "collectionsTotal": "إجمالي التحصيلات",
+    "visits": "زيارات",
+    "sold": "بيع",
+    "salesTotal": "إجمالي المبيعات",
+    "routeAdherence": "التزام السير"
   }
 }

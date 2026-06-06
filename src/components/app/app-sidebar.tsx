@@ -1,5 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/lib/auth-context";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -17,6 +18,7 @@ import {
   ShoppingBag,
   Wallet,
   UsersRound,
+  MapPin,
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,9 +36,12 @@ import {
 export function AppSidebar() {
   const { t } = useTranslation();
   const { state } = useSidebar();
+  const { hasAnyRole } = useAuth();
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
+
+  const showSupervisor = hasAnyRole(["admin", "manager", "supervisor"]);
 
   const groups = [
     {
@@ -46,6 +51,12 @@ export function AppSidebar() {
         { url: "/pos", icon: ShoppingCart, title: t("nav.pos") },
       ],
     },
+    ...(showSupervisor ? [{
+      label: t("nav.field"),
+      items: [
+        { url: "/supervisor", icon: MapPin, title: t("supervisor.title") },
+      ],
+    }] : []),
     {
       label: t("nav.operations"),
       items: [

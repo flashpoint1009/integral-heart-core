@@ -137,3 +137,35 @@ export const createRepCustomer = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { id: row.id, name: row.name };
   });
+
+export const collectFromVisit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({
+      visit_id: z.string().uuid(),
+      customer_id: z.string().uuid(),
+      amount: z.number().positive(),
+      account_id: z.string().uuid(),
+      notes: z.string().max(500).optional(),
+    }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: pay, error: pe } = await context.supabase
+      .from("customer_payments")
+      .insert({
+        customer_id: data.customer_id,
+        amount: data.amount,
+        account_id: data.account_id,
+        payment_date: new Date().toISOString(),
+        notes: data.notes ?? "rep collection",
+        created_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (pe) throw new Error(pe.message);
+    await context.supabase
+      .from("rep_visits")
+      .update({ ended_at: new Date().toISOString(), outcome: "collected", notes: `collected ${data.amount}` })
+      .eq("id", data.visit_id);
+    return { payment_id: pay.id };
+  });
