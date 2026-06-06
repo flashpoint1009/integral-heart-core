@@ -33,6 +33,7 @@ import { Route as AuthenticatedRepSaleRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRepPlanRouteImport } from './routes/_authenticated/rep/plan'
 import { Route as AuthenticatedRepCustomersRouteImport } from './routes/_authenticated/rep/customers'
 import { Route as AuthenticatedRepAttendanceRouteImport } from './routes/_authenticated/rep/attendance'
+import { Route as AuthenticatedRepVisitCustomerIdRouteImport } from './routes/_authenticated/rep/visit.$customerId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -155,6 +156,12 @@ const AuthenticatedRepAttendanceRoute =
     path: '/attendance',
     getParentRoute: () => AuthenticatedRepRouteRoute,
   } as any)
+const AuthenticatedRepVisitCustomerIdRoute =
+  AuthenticatedRepVisitCustomerIdRouteImport.update({
+    id: '/visit/$customerId',
+    path: '/visit/$customerId',
+    getParentRoute: () => AuthenticatedRepRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/rep/plan': typeof AuthenticatedRepPlanRoute
   '/rep/sale': typeof AuthenticatedRepSaleRoute
   '/rep/': typeof AuthenticatedRepIndexRoute
+  '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
 }
 export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
@@ -204,6 +212,7 @@ export interface FileRoutesByTo {
   '/rep/plan': typeof AuthenticatedRepPlanRoute
   '/rep/sale': typeof AuthenticatedRepSaleRoute
   '/rep': typeof AuthenticatedRepIndexRoute
+  '/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -231,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated/rep/plan': typeof AuthenticatedRepPlanRoute
   '/_authenticated/rep/sale': typeof AuthenticatedRepSaleRoute
   '/_authenticated/rep/': typeof AuthenticatedRepIndexRoute
+  '/_authenticated/rep/visit/$customerId': typeof AuthenticatedRepVisitCustomerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -258,6 +268,7 @@ export interface FileRouteTypes {
     | '/rep/plan'
     | '/rep/sale'
     | '/rep/'
+    | '/rep/visit/$customerId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/auth'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/rep/plan'
     | '/rep/sale'
     | '/rep'
+    | '/rep/visit/$customerId'
   id:
     | '__root__'
     | '/_authenticated'
@@ -308,6 +320,7 @@ export interface FileRouteTypes {
     | '/_authenticated/rep/plan'
     | '/_authenticated/rep/sale'
     | '/_authenticated/rep/'
+    | '/_authenticated/rep/visit/$customerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -485,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRepAttendanceRouteImport
       parentRoute: typeof AuthenticatedRepRouteRoute
     }
+    '/_authenticated/rep/visit/$customerId': {
+      id: '/_authenticated/rep/visit/$customerId'
+      path: '/visit/$customerId'
+      fullPath: '/rep/visit/$customerId'
+      preLoaderRoute: typeof AuthenticatedRepVisitCustomerIdRouteImport
+      parentRoute: typeof AuthenticatedRepRouteRoute
+    }
   }
 }
 
@@ -494,6 +514,7 @@ interface AuthenticatedRepRouteRouteChildren {
   AuthenticatedRepPlanRoute: typeof AuthenticatedRepPlanRoute
   AuthenticatedRepSaleRoute: typeof AuthenticatedRepSaleRoute
   AuthenticatedRepIndexRoute: typeof AuthenticatedRepIndexRoute
+  AuthenticatedRepVisitCustomerIdRoute: typeof AuthenticatedRepVisitCustomerIdRoute
 }
 
 const AuthenticatedRepRouteRouteChildren: AuthenticatedRepRouteRouteChildren = {
@@ -502,6 +523,7 @@ const AuthenticatedRepRouteRouteChildren: AuthenticatedRepRouteRouteChildren = {
   AuthenticatedRepPlanRoute: AuthenticatedRepPlanRoute,
   AuthenticatedRepSaleRoute: AuthenticatedRepSaleRoute,
   AuthenticatedRepIndexRoute: AuthenticatedRepIndexRoute,
+  AuthenticatedRepVisitCustomerIdRoute: AuthenticatedRepVisitCustomerIdRoute,
 }
 
 const AuthenticatedRepRouteRouteWithChildren =
@@ -559,3 +581,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
