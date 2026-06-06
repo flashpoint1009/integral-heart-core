@@ -95,19 +95,57 @@ function AuthPage() {
         <LanguageToggle />
       </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10">
+      <div className="relative z-10 min-h-screen grid lg:grid-cols-2 gap-0 px-4 py-10 lg:px-0 lg:py-0">
+        {/* Hero side */}
+        <div className="hidden lg:flex relative items-center justify-center overflow-hidden p-12">
+          {brand?.hero_image_url ? (
+            <>
+              <img
+                src={brand.hero_image_url}
+                alt="hero"
+                className="absolute inset-0 h-full w-full object-cover opacity-60 animate-[fade-in_1s_ease-out]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#070b1c]/90 via-[#070b1c]/40 to-transparent" />
+            </>
+          ) : null}
+          <div className="relative z-10 text-center space-y-6 max-w-md animate-[fade-in_0.8s_ease-out]">
+            {brand?.logo_url && (
+              <img src={brand.logo_url} alt="logo" className="mx-auto h-24 w-24 object-contain drop-shadow-2xl animate-[scale-in_0.6s_ease-out]" />
+            )}
+            <h1 className="text-4xl xl:text-5xl font-bold tracking-tight bg-gradient-to-br from-white via-white to-white/70 bg-clip-text text-transparent">
+              {brand?.title ?? t("app.name")}
+            </h1>
+            <p className="text-lg text-white/70 leading-relaxed">
+              {brand?.subtitle ?? t("app.tagline")}
+            </p>
+            <div className="flex justify-center gap-2 pt-4">
+              {[0,1,2].map((i) => (
+                <span key={i} className="h-1.5 w-8 rounded-full bg-white/30 animate-[pulse_2s_ease-in-out_infinite]" style={{ animationDelay: `${i*0.3}s` }} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Form side */}
+        <div className="flex items-center justify-center">
         <div className="w-full max-w-md animate-[fade-in_0.6s_ease-out]">
           {/* Brand */}
           <div className="flex flex-col items-center gap-3 mb-8">
             <div className="relative">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-400 via-fuchsia-400 to-cyan-300 blur-xl opacity-70" />
-              <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-400 text-white font-bold text-2xl shadow-2xl ring-1 ring-white/30">
-                E
-              </div>
+              {brand?.logo_url ? (
+                <img src={brand.logo_url} alt="logo" className="h-14 w-14 rounded-2xl object-cover shadow-2xl ring-1 ring-white/30" />
+              ) : (
+                <>
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-400 via-fuchsia-400 to-cyan-300 blur-xl opacity-70" />
+                  <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-cyan-400 text-white font-bold text-2xl shadow-2xl ring-1 ring-white/30">
+                    E
+                  </div>
+                </>
+              )}
             </div>
             <div className="text-center">
-              <div className="text-xl font-bold tracking-tight">{t("app.name")}</div>
-              <div className="text-xs text-white/60 mt-1">{t("app.tagline")}</div>
+              <div className="text-xl font-bold tracking-tight">{brand?.title ?? t("app.name")}</div>
+              <div className="text-xs text-white/60 mt-1">{brand?.subtitle ?? t("app.tagline")}</div>
             </div>
           </div>
 
