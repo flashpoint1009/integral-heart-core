@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { repCheckIn, repCheckOut } from "@/lib/api/rep.functions";
@@ -25,15 +25,6 @@ function getPos(): Promise<{ lat: number | null; lng: number | null }> {
   });
 }
 
-function distanceMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
-  const R = 6371000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const s = Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-}
-
 function Attendance() {
   const { t } = useTranslation();
   const qc = useQueryClient();
@@ -42,7 +33,6 @@ function Attendance() {
   const [loadingGps, setLoadingGps] = useState(false);
   const [myPos, setMyPos] = useState<{ lat: number; lng: number } | null>(null);
   const [posError, setPosError] = useState<string | null>(null);
-  const autoTriedRef = useRef(false);
 
   const { data: openCi } = useQuery({
     queryKey: ["rep_open_checkin"],
