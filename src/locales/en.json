@@ -186,5 +186,58 @@
     "change": "Change",
     "amount": "Amount",
     "noProducts": "No active products — add one first"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "add": "Add Supplier",
+    "edit": "Edit Supplier",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "tax_number": "Tax Number",
+    "balance": "Balance",
+    "notes": "Notes"
+  },
+  "settings": {
+    "title": "Company Settings",
+    "description": "Core company information shown on invoices and reports",
+    "company_name": "Company Name",
+    "logo_url": "Logo URL",
+    "currency": "Currency (code)",
+    "currency_symbol": "Currency Symbol",
+    "default_tax_rate": "Default Tax %",
+    "default_locale": "Default Language",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "tax_number": "Tax Number"
+  },
+  "users": {
+    "title": "Users & Roles",
+    "description": "Manage registered users and assign roles",
+    "user": "User",
+    "email": "Email",
+    "roles": "Roles",
+    "noRoles": "No role",
+    "addRole": "Add role",
+    "removeRole": "Remove role",
+    "onlyAdmin": "Role management is admin-only"
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "Business performance summaries",
+    "from": "From",
+    "to": "To",
+    "salesSummary": "Sales Summary",
+    "invoicesCount": "Invoices",
+    "totalSales": "Total Sales",
+    "totalPaid": "Total Paid",
+    "totalDue": "Total Due",
+    "topProducts": "Top Products",
+    "topCustomers": "Top Customers",
+    "qty": "Qty",
+    "total": "Total",
+    "noData": "No data in this period"
   }
 }
